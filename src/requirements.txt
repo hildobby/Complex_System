@@ -1,0 +1,6 @@
+pandas
+matplotlib
+tqdm
+numpy
+random
+csv
