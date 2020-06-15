@@ -5,5 +5,5 @@
 ### Setup required packages
 
 ```
-pip install -r src/requirements.txt
+pip install -r requirements.txt
 ```
