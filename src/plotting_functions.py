@@ -6,14 +6,14 @@ Created on Tuesday June 16 2020
 This code was implemented by
 Louis Weyland, Hildebert Mouilé, Philippe Nicolau & Binjie Zhou.
 """
-
+import matplotlib.pyplot as plt
 
 def plot_setting():
     """
     Change the default matplotlib parameters to make sure the graphs are unifrom
     """
     params = {'legend.fontsize': 'x-large',
-              'figure.figsize': (8, 6),
+              'figure.figsize': (10, 3),
               'axes.labelsize': 'x-large',
               'axes.titlesize': 'x-large',
               'xtick.labelsize': 'x-large',
