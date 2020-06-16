@@ -10,10 +10,11 @@ Louis Weyland, Hildebert Mouilé, Philippe Nicolau & Binjie Zhou.
 
 import matplotlib.pyplot as plt
 import networkx as nx
-from src.plotting_functions import plot_setting
+from plotting_functions import plot_setting
 from random import random, gauss
 import time
-from numba import jit
+from itertools import count
+
 
 
 class Lattice():
@@ -27,6 +28,8 @@ class Lattice():
         self.size = size
         self.lattice = nx.grid_graph(list(size), periodic=torus_mode)
         self.random_dist = rand_dist
+        self.time_step = 0
+        self.threshold = []
 
 
     def random_init(self):
@@ -34,32 +37,109 @@ class Lattice():
         Initialize the fitness values to the graph
         """
         for node in self.lattice.nodes:
-            self.lattice.nodes[node]['fitness'] = random()
+            self.lattice.nodes[node]['fitness'] = self.random_dist()
+
+
+    def get_min(self):
+        """
+        Get the minimum fitness value and its position
+        """
+        min_dict= nx.get_node_attributes(self.lattice, 'fitness')
+        self.min_pos,self.min_value = min(min_dict.items(), key=lambda x: x[1])
+        #print("The position with lowest fintess of {} is {}".format(self.min_value,self.min_pos))
+
+
+    def get_neighbours(self):
+        """
+        Get the neighbours of the lowest fitness
+        """
+        self.neighbours = list(self.lattice.neighbors(self.min_pos))
+
+        # Add if not Neumann get neighbours
+
+
+    def mutation(self):
+        """
+        Mutates the position with the lowest fitness and its neighbours
+        """
+        # Mutate the one with lowest fitness
+        self.lattice.nodes[self.min_pos]['fitness'] = self.random_dist()
+        # Mutate the neighbours
+        for node in (self.neighbours):
+            self.lattice.nodes[node]['fitness'] = self.random_dist()
+
+
+    def run(self,iteration):
+        """
+        Run the Bak-Sneppen model using the different rules
+        """
+
+        for i in range(iteration):
+
+            # initialize the nodes with random values
+            self.random_init()
+
+
+            self.plot()
+
+            # get the nodes with the minimum vale
+            self.get_min()
+
+            self.threshold.append(self.min_value)
+            # get the neigbours
+            self.get_neighbours()
+            # assign new random number to the lowest fitness and its neighbours
+            self.mutation()
+
+            self.time_step += 1
+
+
+
 
     def plot(self,show_labels=False):
         """
         Visualise the graph and plot labels it labels = True
         """
+        values = set(nx.get_node_attributes(self.lattice, 'fitness').values())
+        mapping = dict(zip(sorted(values), count()))
+        nodes = self.lattice.nodes()
+        colors = [mapping[self.lattice.nodes[n]['fitness']] for n in nodes]
 
-        if show_labels == True:
-            labels = nx.get_node_attributes(self.lattice, 'fitness')
-            nx.draw(self.lattice, labels=labels, node_size=20)
-        else:
-            nx.draw(self.lattice, node_size=20)
+        pos = dict( (n, n) for n in self.lattice.nodes() )
+        labels = nx.get_node_attributes(self.lattice, 'fitness')
+        ec = nx.draw_networkx_edges(self.lattice, pos, alpha=0.2)
+        nc = nx.draw_networkx_nodes(self.lattice, pos, labels=labels, nodelist=nodes, node_color=colors,
+                                    with_labels=False, node_size=100, cmap=plt.cm.jet)
 
-        plot_setting()
+        plt.colorbar(nc)
+        plt.axis('off')
         plt.show()
-        plt.close()
+
+        return nc
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
 
-    lattice = Lattice(size=(10,15,1),torus_mode=False)
+    lattice = Lattice(size=(5,4),torus_mode=False)
+
 
     t0 = time.time()
-    lattice.random_init()
-
+    lattice.run(iteration=8)
     t1 = time.time()
     print("Total time needed is {}".format(t1 - t0))
-    lattice.plot()
+    #lattice.plot(show_labels=True)
 
