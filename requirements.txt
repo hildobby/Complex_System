@@ -4,3 +4,9 @@ tqdm
 numpy
 csv
 networkx
+jupyter
+scipy
+itertools
+mpl_toolkits
+importlib
+pickle
