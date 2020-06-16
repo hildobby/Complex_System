@@ -19,3 +19,11 @@ def plot_setting():
               'xtick.labelsize': 'x-large',
               'ytick.labelsize': 'x-large'}
     plt.rcParams.update(params)
+
+def plt_color(i):
+    """
+    Return MatPlotLib default color from cycle at the provided index
+    """
+
+    colors = np.array(plt.rcParams['axes.prop_cycle'].by_key()['color'])
+    return colors[np.array(i) % len(colors)]
