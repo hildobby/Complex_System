@@ -63,7 +63,7 @@ class Lattice():
         # Add min value to collector
         self.min_value_list.append(self.min_value)
 
-        # check whetever the list is empty if not append only new maximum threshold
+        # check whatever the list is empty if not append only new maximum threshold
         if not self.threshold_list:
             self.threshold_list.append(self.min_value)
         elif self.min_value > max(self.threshold_list):
