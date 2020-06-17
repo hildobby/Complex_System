@@ -187,7 +187,7 @@ if __name__ == "__main__":
 
     lattice = Lattice(size=(25,25),torus_mode=False)
     print(nx.info(lattice.lattice, n=None))
-    lattice.run(iteration=1000)
+    lattice.run(iteration=8000)
 
 
 
