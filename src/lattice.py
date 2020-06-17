@@ -21,16 +21,23 @@ import statistics
 
 class Lattice():
 
-    def __init__(self,size=(10,10,1),rand_dist=random,torus_mode=True):
+    def __init__(self,size=(10,10,1),rand_dist=random,torus_mode=True,neighborhood='vonNeumann'):
         """
         Creates the Graph
         :param size: if type is a 2d graph size needs to be tuple, if type= grid_graph size is a list []
         """
-        self.type = type
+
+        # Characteristics of the Network
         self.size = size
         self.lattice = nx.grid_graph(list(size), periodic=torus_mode)
         self.random_dist = rand_dist
+        self.neighbordhood = neighborhood
+
+        # init
         self.time_step = 0
+
+        # collectors
+        self.min_value_list = []
         self.threshold_list = []
         self.average_fit_list = []
 
@@ -63,11 +70,18 @@ class Lattice():
 
     def get_neighbours(self):
         """
-        Get the neighbours of the lowest fitness
+        Get the neighbours of the lowest fitness and return self.neighbours which is a list of tuples
         """
-        self.neighbours = list(self.lattice.neighbors(self.min_pos))
+        if self.neighbordhood == 'vonNeumann':
+            self.neighbours = list(self.lattice.neighbors(self.min_pos))
 
-        # Add if not van Neumann get neighbours
+        elif self.neighbordhood ==  'Moore':
+
+            raise Exception('Need to implement the Moor neighborhood !')
+
+
+
+
 
 
 
@@ -93,10 +107,12 @@ class Lattice():
 
             # nice if animated
             #self.plot()
+
             # get the nodes with the minimum vale
             self.get_min()
+            self.min_value_list.append(self.min_value)
+
             self.get_avergae()
-            self.threshold_list.append(self.min_value)
             self.average_fit_list.append(self.average_fit)
 
             # get the neigbours
@@ -106,7 +122,7 @@ class Lattice():
 
             self.time_step += 1
 
-        plt.plot(self.threshold_list)
+        plt.plot(self.min_value_list)
         plt.plot(self.average_fit_list)
         print("The average fitness is {}".format(self.average_fit_list[-1]))
         plt.show()
