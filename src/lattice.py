@@ -16,6 +16,7 @@ from random import random, gauss
 import time
 from itertools import count
 import statistics
+from collections import defaultdict
 
 
 
@@ -33,13 +34,13 @@ class Lattice():
         self.random_dist = rand_dist
         self.neighbordhood = neighborhood
 
-        # init
-        self.time_step = 0
-
         # collectors
+        self.time_step = 0
+        self.avalanche_timer = 1
         self.min_value_list = []
         self.threshold_list = []
         self.average_fit_list = []
+        self.avalanche_time_list = defaultdict(list)
 
 
     def random_init(self):
@@ -52,11 +53,22 @@ class Lattice():
 
     def get_min(self):
         """
-        Get the minimum fitness value and its position
+        Get the minimum fitness value and its position, add it to collector and
+        add it to threshold list if it is a new max min fitness
         """
         min_dict= nx.get_node_attributes(self.lattice, 'fitness')
         self.min_pos,self.min_value = min(min_dict.items(), key=lambda x: x[1])
         #print("The position with lowest fintess of {} is {}".format(self.min_value,self.min_pos))
+
+        # Add min value to collector
+        self.min_value_list.append(self.min_value)
+
+        # check whetever the list is empty if not append only new maximum threshold
+        if not self.threshold_list:
+            self.threshold_list.append(self.min_value)
+        elif self.min_value > max(self.threshold_list):
+            self.threshold_list.append(self.min_value)
+
 
 
     def get_avergae(self):
@@ -65,7 +77,8 @@ class Lattice():
         """
         fitness_dict = nx.get_node_attributes(self.lattice, 'fitness')
         self.average_fit=statistics.mean([fitness_dict[key] for key in fitness_dict])
-
+        # Add average fitness at each time step to the collector
+        self.average_fit_list.append(self.average_fit)
 
 
     def get_neighbours(self):
@@ -80,20 +93,39 @@ class Lattice():
             raise Exception('Need to implement the Moor neighborhood !')
 
 
-
-
-
-
-
     def mutation(self):
         """
         Mutates the position with the lowest fitness and its neighbours
+        and check the avalanche time is the max of the lowest fitness was increased
         """
         # Mutate the one with lowest fitness
         self.lattice.nodes[self.min_pos]['fitness'] = self.random_dist()
         # Mutate the neighbours
-        for node in (self.neighbours):
+        for node in self.neighbours:
             self.lattice.nodes[node]['fitness'] = self.random_dist()
+
+        # check if new mutation rised the threshold
+        self.get_avalanche_time()
+
+    def get_avalanche_time(self):
+        """
+        Counts the number of iteration need until the threshold is rised to a new max
+        It appends to the list avalanche time list, the time step where a avalanche stops with the respective steps of
+        the avalanche
+        """
+        # combine the node with the lowest fitness and its neighbours
+        self.latest_mutation_pos = []
+        self.latest_mutation_pos = self.neighbours
+        self.latest_mutation_pos.append(self.min_pos)
+
+        # check if all the new mutation are above the max min fintess so if they rised the threshold
+        if not all(self.lattice.nodes[node]['fitness'] > max(self.threshold_list) for node in self.latest_mutation_pos):
+            self.avalanche_timer += 1
+        elif all(self.lattice.nodes[node]['fitness'] > max(self.threshold_list) for node in self.latest_mutation_pos):
+
+            self.avalanche_time_list['avalanche time'].append(self.avalanche_timer)
+            self.avalanche_time_list['time_step'].append(self.time_step)
+            self.avalanche_timer = 1
 
 
     def run(self,iteration):
@@ -110,10 +142,8 @@ class Lattice():
 
             # get the nodes with the minimum vale
             self.get_min()
-            self.min_value_list.append(self.min_value)
 
             self.get_avergae()
-            self.average_fit_list.append(self.average_fit)
 
             # get the neigbours
             self.get_neighbours()
@@ -122,8 +152,10 @@ class Lattice():
 
             self.time_step += 1
 
+        # The plotting need to be fixed
         plt.plot(self.min_value_list)
         plt.plot(self.average_fit_list)
+        plt.plot(self.avalanche_time_list['time_step'],self.avalanche_time_list['avalanche time'])
         print("The average fitness is {}".format(self.average_fit_list[-1]))
         plt.show()
 
@@ -153,9 +185,9 @@ class Lattice():
 
 if __name__ == "__main__":
 
-    lattice = Lattice(size=(20,20),torus_mode=False)
+    lattice = Lattice(size=(25,25),torus_mode=False)
     print(nx.info(lattice.lattice, n=None))
-    lattice.run(iteration=2000)
+    lattice.run(iteration=1000)
 
 
 
