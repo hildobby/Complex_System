@@ -28,7 +28,7 @@ class Lattice():
         """
         self.type = type
         self.size = size
-        self.lattice = nx.grid_graph(list(size), periodic=torus_mode)
+        self.lattice = nx.triangular_lattice_graph(list(size), periodic=torus_mode)
         self.random_dist = rand_dist
         self.time_step = 0
         self.threshold_list = []
@@ -67,8 +67,7 @@ class Lattice():
         """
         self.neighbours = list(self.lattice.neighbors(self.min_pos))
 
-        # Add if not Neumann get neighbours
-
+        # Add if not van Neumann get neighbours
 
 
 
@@ -94,7 +93,6 @@ class Lattice():
 
             # nice if animated
             #self.plot()
-
             # get the nodes with the minimum vale
             self.get_min()
             self.get_avergae()
@@ -141,7 +139,7 @@ if __name__ == "__main__":
 
     lattice = Lattice(size=(20,20),torus_mode=False)
     t0 = time.time()
-    lattice.run(iteration=4000)
+    lattice.run(iteration=2000)
     t1 = time.time()
     print("Total time needed is {}".format(t1 - t0))
 
