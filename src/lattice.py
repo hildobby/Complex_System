@@ -9,6 +9,7 @@ Louis Weyland, Hildebert Mouilé, Philippe Nicolau & Binjie Zhou.
 
 
 import matplotlib.pyplot as plt
+import matplotlib.animation
 import networkx as nx
 from plotting_functions import plot_setting
 from random import random, gauss
@@ -96,19 +97,20 @@ class Lattice():
         plt.show()
 
 
-    def plot(self,show_labels=False):
+    def plot(self):
         """
         Visualise the graph and plot labels it labels = True
         """
         values = set(nx.get_node_attributes(self.lattice, 'fitness').values())
         mapping = dict(zip(sorted(values), count()))
         nodes = self.lattice.nodes()
+
+        # Get the color code and normalise it
         colors = [mapping[self.lattice.nodes[n]['fitness']] for n in nodes]
+        colors = [color/(self.size[0]*self.size[1]) for color in colors]
 
         pos = dict( (n, n) for n in self.lattice.nodes() )
-        labels = nx.get_node_attributes(self.lattice, 'fitness')
-        ec = nx.draw_networkx_edges(self.lattice, pos, alpha=0.2)
-        nc = nx.draw_networkx_nodes(self.lattice, pos, labels=labels, nodelist=nodes, node_color=colors,
+        nc = nx.draw_networkx_nodes(self.lattice, pos, nodelist=nodes, node_color=colors,
                                     with_labels=False, node_size=100, cmap=plt.cm.jet)
 
         plt.colorbar(nc)
@@ -121,11 +123,9 @@ class Lattice():
 if __name__ == "__main__":
 
     lattice = Lattice(size=(40,40),torus_mode=False)
-
-
     t0 = time.time()
     lattice.run(iteration=8)
     t1 = time.time()
     print("Total time needed is {}".format(t1 - t0))
-    #lattice.plot(show_labels=True)
+
 
