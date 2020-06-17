@@ -28,7 +28,7 @@ class Lattice():
         """
         self.type = type
         self.size = size
-        self.lattice = nx.triangular_lattice_graph(list(size), periodic=torus_mode)
+        self.lattice = nx.grid_graph(list(size), periodic=torus_mode)
         self.random_dist = rand_dist
         self.time_step = 0
         self.threshold_list = []
@@ -138,9 +138,9 @@ class Lattice():
 if __name__ == "__main__":
 
     lattice = Lattice(size=(20,20),torus_mode=False)
-    t0 = time.time()
+    print(nx.info(lattice.lattice, n=None))
     lattice.run(iteration=2000)
-    t1 = time.time()
-    print("Total time needed is {}".format(t1 - t0))
+
+
 
 
