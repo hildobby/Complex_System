@@ -15,6 +15,7 @@ from plotting_functions import plot_setting
 from random import random, gauss
 import time
 from itertools import count
+import statistics
 
 
 
@@ -30,7 +31,8 @@ class Lattice():
         self.lattice = nx.grid_graph(list(size), periodic=torus_mode)
         self.random_dist = rand_dist
         self.time_step = 0
-        self.threshold = []
+        self.threshold_list = []
+        self.average_fit_list = []
 
 
     def random_init(self):
@@ -50,6 +52,15 @@ class Lattice():
         #print("The position with lowest fintess of {} is {}".format(self.min_value,self.min_pos))
 
 
+    def get_avergae(self):
+        """
+        Get the average fitness value
+        """
+        fitness_dict = nx.get_node_attributes(self.lattice, 'fitness')
+        self.average_fit=statistics.mean([fitness_dict[key] for key in fitness_dict])
+
+
+
     def get_neighbours(self):
         """
         Get the neighbours of the lowest fitness
@@ -57,6 +68,8 @@ class Lattice():
         self.neighbours = list(self.lattice.neighbors(self.min_pos))
 
         # Add if not Neumann get neighbours
+
+
 
 
     def mutation(self):
@@ -80,12 +93,14 @@ class Lattice():
         for i in range(iteration):
 
             # nice if animated
-            self.plot()
+            #self.plot()
 
             # get the nodes with the minimum vale
             self.get_min()
+            self.get_avergae()
+            self.threshold_list.append(self.min_value)
+            self.average_fit_list.append(self.average_fit)
 
-            self.threshold.append(self.min_value)
             # get the neigbours
             self.get_neighbours()
             # assign new random number to the lowest fitness and its neighbours
@@ -93,7 +108,9 @@ class Lattice():
 
             self.time_step += 1
 
-        plt.plot(self.threshold)
+        plt.plot(self.threshold_list)
+        plt.plot(self.average_fit_list)
+        print("The average fitness is {}".format(self.average_fit_list[-1]))
         plt.show()
 
 
@@ -122,9 +139,9 @@ class Lattice():
 
 if __name__ == "__main__":
 
-    lattice = Lattice(size=(40,40),torus_mode=False)
+    lattice = Lattice(size=(20,20),torus_mode=False)
     t0 = time.time()
-    lattice.run(iteration=8)
+    lattice.run(iteration=4000)
     t1 = time.time()
     print("Total time needed is {}".format(t1 - t0))
 
