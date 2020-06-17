@@ -73,13 +73,12 @@ class Lattice():
         """
         Run the Bak-Sneppen model using the different rules
         """
+        # initialize the nodes with random values
+        self.random_init()
 
         for i in range(iteration):
 
-            # initialize the nodes with random values
-            self.random_init()
-
-
+            # nice if animated
             self.plot()
 
             # get the nodes with the minimum vale
@@ -93,7 +92,8 @@ class Lattice():
 
             self.time_step += 1
 
-
+        plt.plot(self.threshold)
+        plt.show()
 
 
     def plot(self,show_labels=False):
@@ -118,23 +118,9 @@ class Lattice():
         return nc
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 if __name__ == "__main__":
 
-    lattice = Lattice(size=(5,4),torus_mode=False)
+    lattice = Lattice(size=(40,40),torus_mode=False)
 
 
     t0 = time.time()
