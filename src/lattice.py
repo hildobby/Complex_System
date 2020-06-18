@@ -22,7 +22,7 @@ from collections import defaultdict
 
 class Lattice():
 
-    def __init__(self,size=(10,10,1),rand_dist=random,torus_mode=True,neighborhood='vonNeumann'):
+    def __init__(self,size=(10,10,1),rand_dist=random,torus_mode=True,neighborhood='Moore'):
         """
         Creates the Graph
         :param size: if type is a 2d graph size needs to be tuple, if type= grid_graph size is a list []
@@ -87,10 +87,31 @@ class Lattice():
         """
         if self.neighbordhood == 'vonNeumann':
             self.neighbours = list(self.lattice.neighbors(self.min_pos))
-
+            print(self.min_pos)
+            print(self.neighbours)
+            
         elif self.neighbordhood ==  'Moore':
-
-            raise Exception('Need to implement the Moor neighborhood !')
+            print(self.min_pos)
+            self.neighbours = list()
+            # Calculate the neighbours for this object
+            for x1 in range(-1,2):
+                for y1 in range(-1,2):
+                    # Do not loop over yourself
+                    if (x1,y1)!=(0,0):
+                        x2 = (self.min_pos[0]+x1)
+                        y2 = (self.min_pos[1]+y1) % (self.size[0]-1)
+                        if x2>=0 and x2<=self.size[0]-1:
+                            if y2>=0 and y2<=self.size[0]-1:
+                                self.neighbours.append((x2,y2))
+                        else:
+                            if y2>=0 and y2<=self.size[0]-1:
+                                if x2 == -1:
+                                    x2=self.size[0]-1
+                                if x2 == self.size[0]:
+                                    x2=0
+                                self.neighbours.append((x2,y2))
+            
+            print(self.neighbours)
 
 
     def mutation(self):
