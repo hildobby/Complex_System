@@ -18,6 +18,7 @@ from itertools import count
 import statistics
 from collections import defaultdict
 from scipy.spatial import distance
+from copy import deepcopy
 
 
 
@@ -52,6 +53,7 @@ class Lattice():
         self.min_value_list = []
         self.threshold_list = []
         self.average_fit_list = []
+        self.average_age_list = []
         self.avalanche_time_list = defaultdict(list)
         self.distance_btw_mutation_list = []
 
@@ -60,7 +62,7 @@ class Lattice():
         self.check_error()
 
 
-    def random_init(self):
+    def fitness_init(self):
         """
         Initialize the fitness values to the graph using 3 different random distribution
         uniform, exponential and gaussian
@@ -75,6 +77,26 @@ class Lattice():
             for node in self.lattice.nodes:
                 self.lattice.nodes[node]['fitness'] = gauss(self.random_dist_specification[0],
                                                                   self.random_dist_specification[1])
+
+    def age_init(self):
+        """
+        Assigns an age to the nodes which is defined by the last time it underwent mutation
+        """
+        for node in self.lattice.nodes:
+            self.lattice.nodes[node]['age'] = 0
+
+    def update_age(self):
+        """
+        Update the age at each time step appart from the positions in the list pos
+        :param pos: Pos is a list of cells that have been update so the respective nodes are set to zero
+        """
+        for node in self.lattice.nodes:
+            if node in self.latest_mutation_pos_list:
+                self.lattice.nodes[node]['age'] = 0
+            elif node not in self.latest_mutation_pos_list:
+                self.lattice.nodes[node]['age'] += 1
+
+
 
     def get_min(self):
         """
@@ -95,12 +117,17 @@ class Lattice():
 
     def get_avergae(self):
         """
-        Get the average fitness value
+        Get the average fitness/age value
         """
         fitness_dict = nx.get_node_attributes(self.lattice, 'fitness')
-        self.average_fit=statistics.mean([fitness_dict[key] for key in fitness_dict])
+        age_dict = nx.get_node_attributes(self.lattice,'age')
+        # compute the mean
+        self.average_fit = statistics.mean([fitness_dict[key] for key in fitness_dict])
+        self.average_age = statistics.mean([age_dict[key] for key in age_dict])
+
         # Add average fitness at each time step to the collector
         self.average_fit_list.append(self.average_fit)
+        self.average_age_list.append(self.average_age)
 
     def get_neighbours(self):
         """
@@ -137,10 +164,11 @@ class Lattice():
                 self.lattice.nodes[node]['fitness'] = gauss(self.random_dist_specification[0],
                                                             self.random_dist_specification[1])
 
-
-
         # check if new mutation rised the threshold
         self.get_avalanche_time()
+
+        # set the age of the nodes accordingly and needs to be placed after self.get_avalanche_time()
+        self.update_age()
 
     def get_avalanche_time(self):
         """
@@ -149,17 +177,17 @@ class Lattice():
         the avalanche
         """
         # combine the node with the lowest fitness and its neighbours
-        self.latest_mutation_pos = []
-        self.latest_mutation_pos = self.neighbours
-        self.latest_mutation_pos.append(self.min_pos)
+        self.latest_mutation_pos_list = []
+        self.latest_mutation_pos_list = deepcopy(self.neighbours)
+        self.latest_mutation_pos_list.append(self.min_pos)
 
         # check if all the new mutation are above the max min fintess so if they rised the threshold
-        if not all(self.lattice.nodes[node]['fitness'] > max(self.threshold_list) for node in self.latest_mutation_pos):
+        if not all(self.lattice.nodes[node]['fitness'] > max(self.threshold_list) for node in  self.latest_mutation_pos_list):
             self.avalanche_timer += 1
-        elif all(self.lattice.nodes[node]['fitness'] > max(self.threshold_list) for node in self.latest_mutation_pos):
-
+        elif all(self.lattice.nodes[node]['fitness'] > max(self.threshold_list) for node in  self.latest_mutation_pos_list):
             self.avalanche_time_list['avalanche time'].append(self.avalanche_timer)
             self.avalanche_time_list['time_step'].append(self.time_step)
+            # rest avalanche_timer
             self.avalanche_timer = 1
 
     def get_dist_btw_mutation(self):
@@ -180,14 +208,17 @@ class Lattice():
         elif self.old_min_value == -1 :
             # Assing the first value to self.old_min_value
             self.distance_btw_mutation_list.append(0)
-            self.old_min_value = self.min_pos
+
+        # Save current min_pos to compare to the next new min_pos
+        self.old_min_value = deepcopy(self.min_pos)
 
     def run(self,iteration):
         """
         Run the Bak-Sneppen model using the different rules
         """
-        # initialize the nodes with random values
-        self.random_init()
+        # initialize the nodes with fitness and their age
+        self.fitness_init()
+        self.age_init()
 
         for i in range(iteration):
 
@@ -250,11 +281,14 @@ class Lattice():
 if __name__ == "__main__":
     t0 = time.time()
     # if rand_dist take 1 arg, rand_dist=('uniform',) !! Comma needed here
-    lattice = Lattice(size=(10,10),torus_mode=True,rand_dist=('uniform',))
+    lattice = Lattice(size=(20,20),torus_mode=True,rand_dist=('uniform',))
     print(nx.info(lattice.lattice, n=None))
-    lattice.run(iteration=500)
+    lattice.run(iteration=3000)
     t1 = time.time()
 
     print("TOTAL TIME NEEDED {}".format(t1-t0))
+
+    plt.figure()
+    plt.hist(lattice.distance_btw_mutation_list)
 
 
