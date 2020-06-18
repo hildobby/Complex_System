@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation
 import networkx as nx
 from plotting_functions import plot_setting
-from random import random, gauss
+from random import random, gauss, expovariate
 import time
 from itertools import count
 import statistics
@@ -23,7 +23,11 @@ from scipy.spatial import distance
 
 class Lattice():
 
-    def __init__(self,size=(10,10,2),rand_dist=random,torus_mode=True,neighbourhood='vonNeumann',distance='euclidean'):
+    def __init__(self,size=(10,10,2),
+                 rand_dist=('uniform',),
+                 torus_mode=True,
+                 neighbourhood='vonNeumann',
+                 distance='euclidean'):
         """
         Creates the Graph
         :param size: if type is a 2d graph size needs to be tuple, if type= grid_graph size is a list []
@@ -35,7 +39,7 @@ class Lattice():
         # Characteristics of the Network
         self.size = size
         self.lattice = nx.grid_graph(list(size), periodic=torus_mode)
-        self.random_dist = rand_dist
+        self.random_dist,*self.random_dist_specification = rand_dist
         self.neighbourhood = neighbourhood
         self.distance_btw_neighbours = distance   # either "networkx" or "euclidean"
 
@@ -51,12 +55,26 @@ class Lattice():
         self.avalanche_time_list = defaultdict(list)
         self.distance_btw_mutation_list = []
 
+
+        # check for error
+        self.check_error()
+
+
     def random_init(self):
         """
-        Initialize the fitness values to the graph
+        Initialize the fitness values to the graph using 3 different random distribution
+        uniform, exponential and gaussian
         """
-        for node in self.lattice.nodes:
-            self.lattice.nodes[node]['fitness'] = self.random_dist()
+        if self.random_dist == 'uniform':
+            for node in self.lattice.nodes:
+                self.lattice.nodes[node]['fitness'] = random()
+        elif self.random_dist == 'exponential':
+            for node in self.lattice.nodes:
+                self.lattice.nodes[node]['fitness'] = expovariate(self.random_dist_specification[0])
+        elif self.random_dist == 'gauss':
+            for node in self.lattice.nodes:
+                self.lattice.nodes[node]['fitness'] = gauss(self.random_dist_specification[0],
+                                                                  self.random_dist_specification[1])
 
     def get_min(self):
         """
@@ -101,10 +119,25 @@ class Lattice():
         and check the avalanche time is the max of the lowest fitness was increased
         """
         # Mutate the one with lowest fitness
-        self.lattice.nodes[self.min_pos]['fitness'] = self.random_dist()
-        # Mutate the neighbours
-        for node in self.neighbours:
-            self.lattice.nodes[node]['fitness'] = self.random_dist()
+        if self.random_dist == 'uniform':
+            self.lattice.nodes[self.min_pos]['fitness'] = random()
+            # Mutate the neighbours
+            for node in self.neighbours:
+                self.lattice.nodes[node]['fitness'] = random()
+        elif self.random_dist == 'exponential':
+            self.lattice.nodes[self.min_pos]['fitness'] = expovariate(self.random_dist_specification[0])
+            # Mutate the neighbours
+            for node in self.neighbours:
+                self.lattice.nodes[node]['fitness'] = expovariate(self.random_dist_specification[0])
+        elif self.random_dist == 'gauss':
+            self.lattice.nodes[self.min_pos]['fitness'] = gauss(self.random_dist_specification[0],
+                                                                self.random_dist_specification[1])
+            # Mutate the neighbours
+            for node in self.neighbours:
+                self.lattice.nodes[node]['fitness'] = gauss(self.random_dist_specification[0],
+                                                            self.random_dist_specification[1])
+
+
 
         # check if new mutation rised the threshold
         self.get_avalanche_time()
@@ -159,6 +192,7 @@ class Lattice():
         for i in range(iteration):
 
             # nice if animated
+            #plt.figure()
             #self.plot()
 
             # get the nodes with the minimum vale
@@ -176,11 +210,12 @@ class Lattice():
             self.time_step += 1
 
         # The plotting need to be fixed
-        #plt.plot(self.min_value_list)
-        #plt.plot(self.average_fit_list)
-        #plt.plot(self.avalanche_time_list['time_step'],self.avalanche_time_list['avalanche time'])
+        plt.figure()
+        plt.plot(self.min_value_list)
+        plt.plot(self.average_fit_list)
+        plt.plot(self.avalanche_time_list['time_step'],self.avalanche_time_list['avalanche time'])
         print("The average fitness is {}".format(self.average_fit_list[-1]))
-        #plt.show()
+        plt.show()
 
     def plot(self):
         """
@@ -197,18 +232,27 @@ class Lattice():
         pos = dict( (n, n) for n in self.lattice.nodes() )
         nc = nx.draw_networkx_nodes(self.lattice, pos, nodelist=nodes, node_color=colors,
                                     with_labels=False, node_size=100, cmap=plt.cm.jet)
-
         plt.colorbar(nc)
         plt.axis('off')
         plt.show()
-
         return nc
+
+    def check_error(self):
+        # Get possible errors
+        if self.random_dist == ' exponential' and len(self.random_dist_specification) != 1:
+            raise Exception("If distribution is set to exponential, 1 argument must be added !! "
+                            "rand_dist=('exponential',1)")
+        elif self.random_dist == 'gauss' and len(self.random_dist_specification) != 2:
+            raise Exception("If distribution is set to gauss, 2 argument must be added (mean,std) !! "
+                            "rand_dist=('gauss',mean,std)")
+
 
 if __name__ == "__main__":
     t0 = time.time()
-    lattice = Lattice(size=(25,25),torus_mode=False)
+    # if rand_dist take 1 arg, rand_dist=('uniform',) !! Comma needed here
+    lattice = Lattice(size=(10,10),torus_mode=True,rand_dist=('uniform',))
     print(nx.info(lattice.lattice, n=None))
-    lattice.run(iteration=100)
+    lattice.run(iteration=500)
     t1 = time.time()
 
     print("TOTAL TIME NEEDED {}".format(t1-t0))
