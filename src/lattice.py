@@ -164,12 +164,6 @@ class Lattice():
                 self.lattice.nodes[node]['fitness'] = gauss(self.random_dist_specification[0],
                                                             self.random_dist_specification[1])
 
-        # check if new mutation rised the threshold
-        self.get_avalanche_time()
-
-        # set the age of the nodes accordingly and needs to be placed after self.get_avalanche_time()
-        self.update_age()
-
     def get_avalanche_time(self):
         """
         Counts the number of iteration need until the threshold is rised to a new max
@@ -215,6 +209,8 @@ class Lattice():
     def run(self,iteration):
         """
         Run the Bak-Sneppen model using the different rules
+        Important to note that the order needs to be in this respective way
+        For example avalanche time can work before mutation
         """
         # initialize the nodes with fitness and their age
         self.fitness_init()
@@ -229,43 +225,60 @@ class Lattice():
             # get the nodes with the minimum vale
             self.get_min()
 
+            # gets the average fitness/age of all the nodes at each time_step
             self.get_avergae()
 
             # get the neighbours
             self.get_neighbours()
             # assign new random number to the lowest fitness and its neighbours
             self.mutation()
+
+            # check if new mutation rised the threshold
+            self.get_avalanche_time()
+
+            # set the age of the nodes accordingly and needs to be placed after self.get_avalanche_time()
+            self.update_age()
             # get the distance between mutations
             self.get_dist_btw_mutation()
 
             self.time_step += 1
 
-        # The plotting need to be fixed
-        plt.figure()
-        plt.plot(self.min_value_list)
-        plt.plot(self.average_fit_list)
-        plt.plot(self.avalanche_time_list['time_step'],self.avalanche_time_list['avalanche time'])
-        print("The average fitness is {}".format(self.average_fit_list[-1]))
-        plt.show()
 
-    def plot(self):
+    def plot(self,label= 'fitness'):
         """
         Visualise the graph and plot labels it labels = True
         """
-        values = set(nx.get_node_attributes(self.lattice, 'fitness').values())
-        mapping = dict(zip(sorted(values), count()))
-        nodes = self.lattice.nodes()
+        if label == 'fitness':
+            values = set(nx.get_node_attributes(self.lattice, 'fitness').values())
+            mapping = dict(zip(sorted(values), count()))
+            nodes = self.lattice.nodes()
 
-        # Get the color code and normalise it
-        colors = [mapping[self.lattice.nodes[n]['fitness']] for n in nodes]
-        colors = [color/(self.size[0]*self.size[1]) for color in colors]
+            # Get the color code and normalise it
+            colors = [mapping[self.lattice.nodes[n]['fitness']] for n in nodes]
+            colors = [color/(self.size[0]*self.size[1]) for color in colors]
 
-        pos = dict( (n, n) for n in self.lattice.nodes() )
-        nc = nx.draw_networkx_nodes(self.lattice, pos, nodelist=nodes, node_color=colors,
-                                    with_labels=False, node_size=100, cmap=plt.cm.jet)
-        plt.colorbar(nc)
-        plt.axis('off')
-        plt.show()
+            pos = dict( (n, n) for n in self.lattice.nodes() )
+            nc = nx.draw_networkx_nodes(self.lattice, pos, nodelist=nodes, node_color=colors,
+                                        with_labels=False, node_size=100, cmap=plt.cm.jet)
+            #plt.figure()
+            #plt.colorbar(nc)
+            #plt.axis('off')
+
+        elif label == 'age':
+            values = set(nx.get_node_attributes(self.lattice, 'age').values())
+            mapping = dict(zip(sorted(values), count()))
+            nodes = self.lattice.nodes()
+
+            # Get the color code and normalise it
+            colors = [mapping[self.lattice.nodes[n]['age']] for n in nodes]
+
+            pos = dict((n, n) for n in self.lattice.nodes())
+            nc = nx.draw_networkx_nodes(self.lattice, pos, nodelist=nodes, node_color=colors,
+                                        with_labels=False, node_size=100, cmap=plt.cm.cubehelix)
+            #plt.figure()
+            #plt.colorbar(nc)
+            #plt.axis('off')
+
         return nc
 
     def check_error(self):
@@ -279,16 +292,41 @@ class Lattice():
 
 
 if __name__ == "__main__":
+    plot=True
     t0 = time.time()
     # if rand_dist take 1 arg, rand_dist=('uniform',) !! Comma needed here
     lattice = Lattice(size=(20,20),torus_mode=True,rand_dist=('uniform',))
     print(nx.info(lattice.lattice, n=None))
-    lattice.run(iteration=3000)
+    lattice.run(iteration=2000)
     t1 = time.time()
-
+    print("The average fitness is {}".format(lattice.average_fit_list[-1]))
     print("TOTAL TIME NEEDED {}".format(t1-t0))
 
-    plt.figure()
-    plt.hist(lattice.distance_btw_mutation_list)
+    if plot:
+        # make sure the default parameters are the same
+        plot_setting()
+        # The plotting need to be fixed
+        fig, (ax1, ax2, ax3) = plt.subplots(1,3)
+        ax1.plot(lattice.min_value_list,label='min_value')
+        ax1.plot(lattice.average_fit_list,label='average_fitness')
+        ax1.legend()
+        ax1.set_title('Average fitness and max min fit')
+
+        ax2.plot(lattice.avalanche_time_list['time_step'], lattice.avalanche_time_list['avalanche time'])
+        ax2.set_title('Avalanche size over time')
+
+        ax3.hist(lattice.distance_btw_mutation_list)
+        ax3.set_title('Distribution of distinace btw mutation')
+
+        plt.figure()
+        fitness = lattice.plot(label='fitness')
+        plt.colorbar(fitness)
+
+        plt.figure()
+        age = lattice.plot(label='age')
+        plt.colorbar(age)
+
+
+        plt.show()
 
 
