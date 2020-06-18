@@ -17,31 +17,39 @@ import time
 from itertools import count
 import statistics
 from collections import defaultdict
+from scipy.spatial import distance
 
 
 
 class Lattice():
 
-    def __init__(self,size=(10,10,1),rand_dist=random,torus_mode=True,neighborhood='vonNeumann'):
+    def __init__(self,size=(10,10,2),rand_dist=random,torus_mode=True,neighbourhood='vonNeumann',distance='euclidean'):
         """
         Creates the Graph
         :param size: if type is a 2d graph size needs to be tuple, if type= grid_graph size is a list []
+        In the model lattice itself the Bak-Snappen model is simulated collecting all the attributes such as the
+        avalanche time, distance between mutations. The neighbourhood can be chosen between vonNeumann and Moore.
+        The distance can be chosen between networkx and euclidean.
         """
 
         # Characteristics of the Network
         self.size = size
         self.lattice = nx.grid_graph(list(size), periodic=torus_mode)
         self.random_dist = rand_dist
-        self.neighbordhood = neighborhood
+        self.neighbourhood = neighbourhood
+        self.distance_btw_neighbours = distance   # either "networkx" or "euclidean"
+
+        # initialising counters and single variable
+        self.time_step = 0
+        self.old_min_value = -1
+        self.avalanche_timer = 1
 
         # collectors
-        self.time_step = 0
-        self.avalanche_timer = 1
         self.min_value_list = []
         self.threshold_list = []
         self.average_fit_list = []
         self.avalanche_time_list = defaultdict(list)
-
+        self.distance_btw_mutation_list = []
 
     def random_init(self):
         """
@@ -50,7 +58,6 @@ class Lattice():
         for node in self.lattice.nodes:
             self.lattice.nodes[node]['fitness'] = self.random_dist()
 
-
     def get_min(self):
         """
         Get the minimum fitness value and its position, add it to collector and
@@ -58,7 +65,6 @@ class Lattice():
         """
         min_dict= nx.get_node_attributes(self.lattice, 'fitness')
         self.min_pos,self.min_value = min(min_dict.items(), key=lambda x: x[1])
-        #print("The position with lowest fintess of {} is {}".format(self.min_value,self.min_pos))
 
         # Add min value to collector
         self.min_value_list.append(self.min_value)
@@ -69,8 +75,6 @@ class Lattice():
         elif self.min_value > max(self.threshold_list):
             self.threshold_list.append(self.min_value)
 
-
-
     def get_avergae(self):
         """
         Get the average fitness value
@@ -80,18 +84,16 @@ class Lattice():
         # Add average fitness at each time step to the collector
         self.average_fit_list.append(self.average_fit)
 
-
     def get_neighbours(self):
         """
         Get the neighbours of the lowest fitness and return self.neighbours which is a list of tuples
         """
-        if self.neighbordhood == 'vonNeumann':
+        if self.neighbourhood == 'vonNeumann':
             self.neighbours = list(self.lattice.neighbors(self.min_pos))
 
-        elif self.neighbordhood ==  'Moore':
+        elif self.neighbourhood == 'Moore':
 
             raise Exception('Need to implement the Moor neighborhood !')
-
 
     def mutation(self):
         """
@@ -127,6 +129,25 @@ class Lattice():
             self.avalanche_time_list['time_step'].append(self.time_step)
             self.avalanche_timer = 1
 
+    def get_dist_btw_mutation(self):
+        """
+        Get the distance between minimum fintess nodes and the next minimum fitness nodes
+        Using the build in function the distances is compute by how many nodes to go  before reaching the target
+        So if  source is 0,0 and target is 1,1 , the lenght will be 2 and not as in euclidean space 1.4
+        So both networkx and euclidean method are implemented
+        """
+        if self.old_min_value != -1:
+            if self.distance_btw_neighbours == 'networkx':
+                dist = nx.shortest_path_length(self.lattice, self.min_pos, self.old_min_value)
+                self.distance_btw_mutation_list.append(dist)
+            elif self.distance_btw_neighbours == 'euclidean':
+                dist = distance.euclidean(self.min_pos, self.old_min_value)
+                self.distance_btw_mutation_list.append(dist)
+
+        elif self.old_min_value == -1 :
+            # Assing the first value to self.old_min_value
+            self.distance_btw_mutation_list.append(0)
+            self.old_min_value = self.min_pos
 
     def run(self,iteration):
         """
@@ -145,20 +166,21 @@ class Lattice():
 
             self.get_avergae()
 
-            # get the neigbours
+            # get the neighbours
             self.get_neighbours()
             # assign new random number to the lowest fitness and its neighbours
             self.mutation()
+            # get the distance between mutations
+            self.get_dist_btw_mutation()
 
             self.time_step += 1
 
         # The plotting need to be fixed
-        plt.plot(self.min_value_list)
-        plt.plot(self.average_fit_list)
-        plt.plot(self.avalanche_time_list['time_step'],self.avalanche_time_list['avalanche time'])
+        #plt.plot(self.min_value_list)
+        #plt.plot(self.average_fit_list)
+        #plt.plot(self.avalanche_time_list['time_step'],self.avalanche_time_list['avalanche time'])
         print("The average fitness is {}".format(self.average_fit_list[-1]))
-        plt.show()
-
+        #plt.show()
 
     def plot(self):
         """
@@ -182,13 +204,13 @@ class Lattice():
 
         return nc
 
-
 if __name__ == "__main__":
-
+    t0 = time.time()
     lattice = Lattice(size=(25,25),torus_mode=False)
     print(nx.info(lattice.lattice, n=None))
-    lattice.run(iteration=8000)
+    lattice.run(iteration=100)
+    t1 = time.time()
 
-
+    print("TOTAL TIME NEEDED {}".format(t1-t0))
 
 
