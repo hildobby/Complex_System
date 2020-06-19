@@ -229,7 +229,7 @@ class Lattice():
                 dist = distance.euclidean(self.min_pos, self.old_min_value)
                 self.distance_btw_mutation_list.append(dist)
 
-        elif self.old_min_value == -1 :
+        elif self.old_min_value == -1:
             # Assing the first value to self.old_min_value
             self.distance_btw_mutation_list.append(0)
 
@@ -323,17 +323,17 @@ class Lattice():
 
 if __name__ == "__main__":
 
-    plot=False
-    iterations = 20
+    plot=True
+    iterations = 200
     t0 = time.time()
     # if rand_dist take 1 arg, rand_dist=('uniform',) !! Comma needed here
-    lattice = Lattice(size=(20,20,2),torus_mode=True,rand_dist=('uniform',),free_percent=0.1)
+    lattice = Lattice(size=(20,20),torus_mode=True,rand_dist=('uniform',),free_percent=0.1)
     print(nx.info(lattice.lattice, n=None))
-    #lattice.run(iteration=iterations)
+    lattice.run(iteration=iterations)
     t1 = time.time()
 
-    #print("The average fitness is {}".format(lattice.average_fit_list[-1]))
-    #print("TOTAL TIME NEEDED {}".format(t1-t0))
+    print("The average fitness is {}".format(lattice.average_fit_list[-1]))
+    print("TOTAL TIME NEEDED {}".format(t1-t0))
 
     if plot:
         # make sure the default parameters are the same
