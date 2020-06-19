@@ -66,16 +66,16 @@ class Lattice():
         Initialize the fitness values to the graph using 3 different random distribution
         uniform, exponential and gaussian
         """
-        if self.random_dist == 'uniform':
-            for node in self.lattice.nodes:
+        #if self.random_dist == 'uniform':
+        for node in self.lattice.nodes:
                 self.lattice.nodes[node]['fitness'] = random()
-        elif self.random_dist == 'exponential':
-            for node in self.lattice.nodes:
-                self.lattice.nodes[node]['fitness'] = expovariate(self.random_dist_specification[0])
-        elif self.random_dist == 'gauss':
-            for node in self.lattice.nodes:
-                self.lattice.nodes[node]['fitness'] = gauss(self.random_dist_specification[0],
-                                                                  self.random_dist_specification[1])
+        #elif self.random_dist == 'exponential':
+        #    for node in self.lattice.nodes:
+        #        self.lattice.nodes[node]['fitness'] = expovariate(self.random_dist_specification[0])
+        #elif self.random_dist == 'gauss':
+        #    for node in self.lattice.nodes:
+        #        self.lattice.nodes[node]['fitness'] = gauss(self.random_dist_specification[0],
+        #                                                          self.random_dist_specification[1])
 
     def age_init(self):
         """
@@ -308,12 +308,14 @@ class Lattice():
 
 
 if __name__ == "__main__":
+
     plot=True
+    iterations = 2000
     t0 = time.time()
     # if rand_dist take 1 arg, rand_dist=('uniform',) !! Comma needed here
     lattice = Lattice(size=(20,20),torus_mode=True,rand_dist=('uniform',))
     print(nx.info(lattice.lattice, n=None))
-    lattice.run(iteration=2000)
+    lattice.run(iteration=iterations)
     t1 = time.time()
     print("The average fitness is {}".format(lattice.average_fit_list[-1]))
     print("TOTAL TIME NEEDED {}".format(t1-t0))
@@ -326,19 +328,22 @@ if __name__ == "__main__":
         ax1.plot(lattice.min_value_list,label='min_value')
         ax1.plot(lattice.average_fit_list,label='average_fitness')
         ax1.legend()
-        ax1.set_title('Average fitness and max min fit')
+        ax1.set_title('Average fitness and maximum minimum fit')
 
         ax2.plot(lattice.avalanche_time_list['time_step'], lattice.avalanche_time_list['avalanche time'])
         ax2.set_title('Avalanche size over time')
 
         ax3.hist(lattice.distance_btw_mutation_list)
-        ax3.set_title('Distribution of distinace btw mutation')
+        ax3.set_title('The Distribution of the distances between mutations')
+
 
         plt.figure()
+        plt.title('Fitness Distribution')
         fitness = lattice.plot(label='fitness')
         plt.colorbar(fitness)
 
         plt.figure()
+        plt.title('Age Distribution after {} itr'.format(iterations))
         age = lattice.plot(label='age')
         plt.colorbar(age)
 
