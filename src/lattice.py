@@ -27,7 +27,8 @@ class Lattice():
                  rand_dist=('uniform',),
                  torus_mode=True,
                  neighbourhood='vonNeumann',
-                 distance='euclidean'):
+                 distance='euclidean',
+                 free_precent=0.1):
         """
         Creates the Graph
         :param size: if type is a 2d graph size needs to be tuple, if type= grid_graph size is a list []
@@ -42,6 +43,7 @@ class Lattice():
         self.random_dist,*self.random_dist_specification = rand_dist
         self.neighbourhood = neighbourhood
         self.distance_btw_neighbours = distance   # either "networkx" or "euclidean"
+        self.free_precent = free_precent
 
         # initialising counters and single variable
         self.time_step = 0
@@ -83,6 +85,19 @@ class Lattice():
         """
         for node in self.lattice.nodes:
             self.lattice.nodes[node]['age'] = 0
+            
+    
+    
+    def free_init(self):
+        """
+        Assigns an if the node is free or not
+        """
+        for node in self.lattice.nodes:
+            if random() > self.free_precent:
+                self.lattice.nodes[node]['is_free'] = False
+            else:
+                self.lattice.nodes[node]['is_free'] = True
+
 
     def update_age(self):
         """
@@ -134,6 +149,12 @@ class Lattice():
         """
         if self.neighbourhood == 'vonNeumann':
             self.neighbours = list(self.lattice.neighbors(self.min_pos))
+            if self.min_pos[0]==0:
+                self.neighbours.append((self.size[0]-1,self.min_pos[1]))
+            elif self.min_pos[0]==self.size[0]-1:
+                print((0,self.min_pos[1]))
+                self.neighbours.append((0,self.min_pos[1]))
+            print(self.neighbours)
             
         elif self.neighbordhood ==  'Moore':
             print(self.min_pos)
@@ -145,11 +166,10 @@ class Lattice():
                     if (x1,y1)!=(0,0):
                         x2 = (self.min_pos[0]+x1)
                         y2 = (self.min_pos[1]+y1) % (self.size[0]-1)
-                        if x2>=0 and x2<=self.size[0]-1:
-                            if y2>=0 and y2<=self.size[0]-1:
+                        if y2>=0 and y2<=self.size[0]-1:
+                            if x2>=0 and x2<=self.size[0]-1:
                                 self.neighbours.append((x2,y2))
-                        else:
-                            if y2>=0 and y2<=self.size[0]-1:
+                            else:
                                 if x2 == -1:
                                     x2=self.size[0]-1
                                 if x2 == self.size[0]:
@@ -231,6 +251,7 @@ class Lattice():
         # initialize the nodes with fitness and their age
         self.fitness_init()
         self.age_init()
+        self.free_init()
 
         for i in range(iteration):
 
