@@ -23,7 +23,7 @@ from copy import deepcopy
 
 
 class Lattice():
-    def __init__(self,size=(10,10,2),
+    def __init__(self,size=(10,10),
                  rand_dist=('uniform',),
                  torus_mode=True,
                  neighbourhood='vonNeumann',
@@ -58,6 +58,7 @@ class Lattice():
         self.average_age_list = []
         self.avalanche_time_list = defaultdict(list)
         self.distance_btw_mutation_list = []
+        self.neighbours_list = []
 
 
         # check for error
@@ -95,7 +96,7 @@ class Lattice():
 
     def update_age(self):
         """
-        Update the age at each time step appart from the positions in the list pos
+        Update the age at each time step apart from the positions in the list pos
         :param pos: Pos is a list of cells that have been update so the respective nodes are set to zero
         """
         for node in nx.get_node_attributes(lattice.lattice,'age').keys():
@@ -141,17 +142,17 @@ class Lattice():
         Get the neighbours of the lowest fitness and return self.neighbours which is a list of tuples
         """
         if self.neighbourhood == 'vonNeumann':
-            self.neighbours = list(self.lattice.neighbors(self.min_pos))
+            self.neighbours_list = list(self.lattice.neighbors(self.min_pos))
             if self.min_pos[0]==0:
-                self.neighbours.append((self.size[0]-1,self.min_pos[1]))
+                self.neighbours_list.append((self.size[0]-1,self.min_pos[1]))
             elif self.min_pos[0]==self.size[0]-1:
                 #print((0,self.min_pos[1]))
-                self.neighbours.append((0,self.min_pos[1]))
+                self.neighbours_list.append((0,self.min_pos[1]))
            # print(self.neighbours)
             
-        elif self.neighbordhood ==  'Moore':
+        elif self.neighbourdhood == 'Moore':
             #print(self.min_pos)
-            self.neighbours = list()
+            self.neighbours_list = list()
             # Calculate the neighbours for this object
             for x1 in range(-1,2):
                 for y1 in range(-1,2):
@@ -161,13 +162,13 @@ class Lattice():
                         y2 = (self.min_pos[1]+y1) % (self.size[0]-1)
                         if y2>=0 and y2<=self.size[0]-1:
                             if x2>=0 and x2<=self.size[0]-1:
-                                self.neighbours.append((x2,y2))
+                                self.neighbours_list.append((x2,y2))
                             else:
                                 if x2 == -1:
                                     x2=self.size[0]-1
                                 if x2 == self.size[0]:
                                     x2=0
-                                self.neighbours.append((x2,y2))
+                                self.neighbours_list.append((x2,y2))
 
     def mutation(self):
         """
@@ -178,18 +179,18 @@ class Lattice():
         if self.random_dist == 'uniform':
             self.lattice.nodes[self.min_pos]['fitness'] = random()
             # Mutate the neighbours
-            for node in self.neighbours:
+            for node in self.neighbours_list:
                 self.lattice.nodes[node]['fitness'] = random()
         elif self.random_dist == 'exponential':
             self.lattice.nodes[self.min_pos]['fitness'] = expovariate(self.random_dist_specification[0])
             # Mutate the neighbours
-            for node in self.neighbours:
+            for node in  self.neighbours_list:
                 self.lattice.nodes[node]['fitness'] = expovariate(self.random_dist_specification[0])
         elif self.random_dist == 'gauss':
             self.lattice.nodes[self.min_pos]['fitness'] = gauss(self.random_dist_specification[0],
                                                                 self.random_dist_specification[1])
             # Mutate the neighbours
-            for node in self.neighbours:
+            for node in  self.neighbours_list :
                 self.lattice.nodes[node]['fitness'] = gauss(self.random_dist_specification[0],
                                                             self.random_dist_specification[1])
 
@@ -201,7 +202,7 @@ class Lattice():
         """
         # combine the node with the lowest fitness and its neighbours
         self.latest_mutation_pos_list = []
-        self.latest_mutation_pos_list = deepcopy(self.neighbours)
+        self.latest_mutation_pos_list = deepcopy( self.neighbours_list )
         self.latest_mutation_pos_list.append(self.min_pos)
 
         # check if all the new mutation are above the max min fintess so if they rised the threshold
@@ -259,6 +260,7 @@ class Lattice():
             # get the neighbours
             self.get_neighbours()
             # assign new random number to the lowest fitness and its neighbours
+
             self.mutation()
 
             # check if new mutation rised the threshold
@@ -321,16 +323,17 @@ class Lattice():
 
 if __name__ == "__main__":
 
-    plot=True
-    iterations = 2000
+    plot=False
+    iterations = 20
     t0 = time.time()
     # if rand_dist take 1 arg, rand_dist=('uniform',) !! Comma needed here
-    lattice = Lattice(size=(20,20),torus_mode=True,rand_dist=('uniform',),free_percent=0.1)
+    lattice = Lattice(size=(20,20,2),torus_mode=True,rand_dist=('uniform',),free_percent=0.1)
     print(nx.info(lattice.lattice, n=None))
-    lattice.run(iteration=iterations)
+    #lattice.run(iteration=iterations)
     t1 = time.time()
-    print("The average fitness is {}".format(lattice.average_fit_list[-1]))
-    print("TOTAL TIME NEEDED {}".format(t1-t0))
+
+    #print("The average fitness is {}".format(lattice.average_fit_list[-1]))
+    #print("TOTAL TIME NEEDED {}".format(t1-t0))
 
     if plot:
         # make sure the default parameters are the same
