@@ -346,7 +346,6 @@ class Lattice():
             values = set(self.age_dict.values())
             mapping = dict(zip(sorted(values), count()))
             nodes_ages = self.age_dict.keys()
-            print(nodes_ages)
 
             # Get the color code and normalise it
             colors = [mapping[self.lattice.nodes[n]['age']] for n in nodes_ages]
@@ -410,7 +409,6 @@ if __name__ == "__main__":
         plt.title('Age Distribution after {} itr'.format(iterations))
         age = lattice.plot(label='age')
         plt.colorbar(age)
-
 
         plt.show()
 
