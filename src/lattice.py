@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation
 import networkx as nx
 from plotting_functions import plot_setting
-from random import random, gauss, expovariate
+from random import random, gauss, expovariate, shuffle
 import time
 from itertools import count
 import statistics
@@ -21,14 +21,14 @@ from scipy.spatial import distance
 from copy import deepcopy
 
 
-
 class Lattice():
     def __init__(self,size=(10,10),
                  rand_dist=('uniform',),
                  torus_mode=True,
                  neighbourhood='vonNeumann',
                  distance='euclidean',
-                 free_percent=0.1):
+                 free_percent=0.1,
+                 mutate_chance=0.5):
         """
         Creates the Graph
         :param size: if type is a 2d graph size needs to be tuple, if type= grid_graph size is a list []
@@ -44,6 +44,7 @@ class Lattice():
         self.neighbourhood = neighbourhood
         self.distance_btw_neighbours = distance   # either "networkx" or "euclidean"
         self.free_percent = free_percent
+        self.mutate_chance = mutate_chance
 
 
         # initialising counters and single variable
@@ -158,12 +159,13 @@ class Lattice():
         self.average_fit_list.append(self.average_fit)
         self.average_age_list.append(self.average_age)
 
-    def get_neighbours(self):
+    def get_neighbours(self, chosen_node):
         """
-        Get the neighbours of the lowest fitness and return self.neighbours which is a list of tuples
+        Get the neighbours of the given node and return self.neighbours which is a list of tuples
         """
         if self.neighbourhood == 'vonNeumann':
-            self.neighbours_list = list(self.lattice.neighbors(self.min_pos))
+            neighbours_list = list(self.lattice.neighbors(chosen_node))
+            return neighbours_list
             # I think we can delete the line that are commented out since this function
             # is taken into account by the periodicity function in nx.grid_graph line 42
             # maybe Moore neighbourhood must also be change but not sure
@@ -175,24 +177,25 @@ class Lattice():
            # print(self.neighbours)
             
         elif self.neighbourdhood == 'Moore':
-            #print(self.min_pos)
-            self.neighbours_list = list()
+            neighbours_list = list()
             # Calculate the neighbours for this object
             for x1 in range(-1,2):
                 for y1 in range(-1,2):
                     # Do not loop over yourself
                     if (x1,y1)!=(0,0):
-                        x2 = (self.min_pos[0]+x1)
-                        y2 = (self.min_pos[1]+y1) % (self.size[0]-1)
+                        x2 = (chosen_node[0]+x1)
+                        y2 = (chosen_node[1]+y1) % (self.size[0]-1)
                         if y2>=0 and y2<=self.size[0]-1:
                             if x2>=0 and x2<=self.size[0]-1:
-                                self.neighbours_list.append((x2,y2))
+                                neighbours_list.append((x2,y2))
                             else:
                                 if x2 == -1:
                                     x2=self.size[0]-1
                                 if x2 == self.size[0]:
                                     x2=0
-                                self.neighbours_list.append((x2,y2))
+                                neighbours_list.append((x2,y2))
+            
+            return neighbours_list
 
     def mutation(self):
         """
@@ -233,6 +236,49 @@ class Lattice():
                                                             self.random_dist_specification[1])
                     self.latest_mutation_pos_list.append(node)
 
+    
+    def move(self):
+        """
+        The node with lowest fitness get moved to free place when the mean fitness of its neighbors is above the total average while lower than new neighbors
+        """
+        free_nodes = list(dict(filter(lambda elem: elem[1], self.free_dict.items())).keys())
+        shuffle(free_nodes)
+        neighbours_fitness_list = []
+        
+        for neighbour in self.neighbours_list:
+            if not self.lattice.nodes(data=True)[neighbour]['is_free']:
+                neighbours_fitness_list.append(self.lattice.nodes(data=True)[neighbour]['fitness'])
+                
+        if neighbours_fitness_list and statistics.mean(neighbours_fitness_list) < self.average_fit:
+            for free_node in free_nodes:
+                neighbours_fitness_list = []
+                for neighbour in self.get_neighbours(free_node):
+                    if not self.lattice.nodes(data=True)[neighbour]['is_free']:
+                        neighbours_fitness_list.append(self.lattice.nodes(data=True)[neighbour]['fitness'])
+                
+                if neighbours_fitness_list and statistics.mean(neighbours_fitness_list) > self.average_fit:
+                    self.lattice.nodes[free_node].update(self.lattice.nodes[self.min_pos])
+                    
+                    del self.lattice.nodes[self.min_pos]['fitness']
+                    del self.lattice.nodes[self.min_pos]['age']
+                    self.lattice.nodes[self.min_pos]['is_free'] = True
+                    self.min_pos = free_node
+                    
+                    self.get_nodes_w_fitness()
+                    self.get_nodes_w_age()
+                    self.get_nodes_w_is_free()
+                    break
+        self.mutation()
+        
+
+    def move_or_mutate(self):
+        """
+        Choosing between mutating the node with the lowest fitness or moving the node to free spaces
+        """
+        if random()<self.mutate_chance:
+            self.mutation()
+        else:
+            self.move()
 
 
     def get_avalanche_time(self):
@@ -300,10 +346,12 @@ class Lattice():
             self.get_average()
 
             # get the neighbours
-            self.get_neighbours()
+            self.neighbours_list = self.get_neighbours(self.min_pos)
 
             # assign new random number to the lowest fitness and its neighbours
-            self.mutation()
+            #self.mutation()
+            
+            self.move_or_mutate()
 
             # check if new mutation rise the threshold
             self.get_avalanche_time()
