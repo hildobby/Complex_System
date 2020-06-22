@@ -19,6 +19,7 @@ import statistics
 from collections import defaultdict
 from scipy.spatial import distance
 from copy import deepcopy
+import math
 
 
 
@@ -50,6 +51,7 @@ class Lattice():
         self.time_step = 0
         self.old_min_value = -1
         self.avalanche_timer = 1
+        self.age_fraction = 1/10
 
         # collectors
         self.min_value_list = []
@@ -65,11 +67,29 @@ class Lattice():
         self.fitness_dict = {}
         self.age_dict = {}
         self.free_dict = {}
+        
+    
 
 
         # check for error
         self.check_error()
 
+    def cluster_colour(self,node):
+        """
+        Introduces "colour" to the nodes for the cluster analysis. 
+        We define ranges of ages for the clustering.
+        The variable "age_fraction" defines the size of each age range 
+        as a fraction.
+        """
+        
+        #define max & min age
+        max_age = iterations
+        min_age = 0
+        #each cluster has an age range given by:
+        cluster_age_range = (max_age - min_age) * self.age_fraction
+        
+        self.lattice.nodes[node]['colour'] = math.ceil(self.lattice.nodes[node]['age'] / cluster_age_range)
+        
 
     def fitness_init(self,node):
         """
@@ -217,7 +237,7 @@ class Lattice():
             self.lattice.nodes[self.min_pos]['fitness'] = expovariate(self.random_dist_specification[0])
             # Mutate the neighbours
             for node in self.neighbours_list:
-                # check if the node has the attribute fitness
+                # check if the node has the fitness attribute
                 if node in self.fitness_dict.keys():
                     self.lattice.nodes[node]['fitness'] = expovariate(self.random_dist_specification[0])
                     self.latest_mutation_pos_list.append(node)
@@ -293,7 +313,7 @@ class Lattice():
             #plt.figure()
             #self.plot()
 
-            # get the nodes with the minimum vale
+            # get the nodes with the minimum value
             self.get_min()
 
             # gets the average fitness/age of all the nodes at each time_step
@@ -367,6 +387,35 @@ class Lattice():
         elif self.random_dist == 'gauss' and len(self.random_dist_specification) != 2:
             raise Exception("If distribution is set to gauss, 2 argument must be added (mean,std) !! "
                             "rand_dist=('gauss',mean,std)")
+            
+    def get_clusters(self):
+        """
+        Get clusters and respective sizes
+        """
+        
+        #Empty queue for the algorithm
+        Q = []
+        
+        
+        #Get clusters and respective sizes
+        if self.neighbourhood == 'vonNeumann':
+            
+            for node in self.age_dict:
+                n_colour = self.lattice.nodes[node]['colour'] 
+                if n_colour != 0:
+                    Q.append(node)
+                while len(Q) != 0:
+                    #take first from Queue and its neighbours
+                    
+                    
+                
+         
+         
+            
+            
+            
+        #elif self.neighbourdhood == 'Moore':
+            
 
 
 if __name__ == "__main__":
