@@ -391,12 +391,12 @@ class Lattice():
 
             # get the distance between mutations
             self.get_dist_btw_mutation()
+            
 # =============================================================================
-#             
 #             #get clusters
 #             self.get_clusters()
-# 
 # =============================================================================
+
             self.time_step += 1
 
 
@@ -451,7 +451,6 @@ class Lattice():
 #         """
 #         Get clusters and respective sizes
 #         """
-#         
 #         #Empty queue for the algorithm
 #         Q = []
 #         #Empty list for each cluster
@@ -487,9 +486,9 @@ class Lattice():
 #                 Clusters.append([n_colour,cluster_size])
 #                 
 #                     
-#             self.cluster_list.append([Clusters])    
+#         self.cluster_list.append([Clusters])    
+#         
 # =============================================================================
-                
          
 
 if __name__ == "__main__":
