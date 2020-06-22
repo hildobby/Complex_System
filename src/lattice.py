@@ -53,6 +53,7 @@ class Lattice():
         self.old_min_value = -1
         self.avalanche_timer = 1
         self.age_fraction = 1/10
+        
 
         # collectors
         self.min_value_list = []
@@ -63,6 +64,7 @@ class Lattice():
         self.distance_btw_mutation_list = []
         self.neighbours_list = []
         self.latest_mutation_pos_list = []
+        self.cluster_list = []
 
         # Collects the nodes that have a fitness/age/free
         self.fitness_dict = {}
@@ -75,21 +77,23 @@ class Lattice():
         # check for error
         self.check_error()
 
-    def cluster_colour(self,node):
-        """
-        Introduces "colour" to the nodes for the cluster analysis. 
-        We define ranges of ages for the clustering.
-        The variable "age_fraction" defines the size of each age range 
-        as a fraction.
-        """
-        
-        #define max & min age
-        max_age = iterations
-        min_age = 0
-        #each cluster has an age range given by:
-        cluster_age_range = (max_age - min_age) * self.age_fraction
-        
-        self.lattice.nodes[node]['colour'] = math.ceil(self.lattice.nodes[node]['age'] / cluster_age_range)
+# =============================================================================
+#     def cluster_colour(self,node):
+#         """
+#         Introduces "colour" to the nodes for the cluster analysis. 
+#         We define ranges of ages for the clustering.
+#         The variable "age_fraction" defines the size of each age range 
+#         as a fraction.
+#         """
+#         
+#         #define max & min age
+#         max_age = 20
+#         min_age = 0
+#         #each cluster has an age range given by:
+#         cluster_age_range = (max_age - min_age) * self.age_fraction
+#         
+#         self.lattice.nodes[node]['colour'] = math.ceil(self.lattice.nodes[node]['age'] / cluster_age_range)
+# =============================================================================
         
 
     def fitness_init(self,node):
@@ -359,6 +363,7 @@ class Lattice():
             #plt.figure()
             #self.plot()
 
+
             # get the nodes with the minimum value
             self.get_min()
 
@@ -386,7 +391,12 @@ class Lattice():
 
             # get the distance between mutations
             self.get_dist_btw_mutation()
-
+# =============================================================================
+#             
+#             #get clusters
+#             self.get_clusters()
+# 
+# =============================================================================
             self.time_step += 1
 
 
@@ -436,40 +446,56 @@ class Lattice():
             raise Exception("If distribution is set to gauss, 2 argument must be added (mean,std) !! "
                             "rand_dist=('gauss',mean,std)")
             
-    def get_clusters(self):
-        """
-        Get clusters and respective sizes
-        """
-        
-        #Empty queue for the algorithm
-        Q = []
-        
-        
-        #Get clusters and respective sizes
-        if self.neighbourhood == 'vonNeumann':
-            
-            for node in self.age_dict:
-                n_colour = self.lattice.nodes[node]['colour'] 
-                if n_colour != 0:
-                    Q.append(node)
-                while len(Q) != 0:
-                    #take first from Queue and its neighbours
-                    
-                    
+# =============================================================================
+#     def get_clusters(self):
+#         """
+#         Get clusters and respective sizes
+#         """
+#         
+#         #Empty queue for the algorithm
+#         Q = []
+#         #Empty list for each cluster
+#         Clusters = []
+#         
+#         #Assign 'colour' to every node
+#         for node in self.age_dict:
+#             self.cluster_colour(node)
+#         
+#         #Get clusters and respective sizes
+#         for node in self.age_dict:
+#             print(node)
+#             cluster_size = 0
+#             n_colour = self.lattice.nodes[node]['colour'] 
+#             if n_colour != 0:
+#                 Q.append(node)
+#                 cluster_size += 1
+#                 
+#             while len(Q) != 0:
+#                 #take first from Queue and its neighbours
+#                 neighbours = self.get_neighbours(Q[0])
+#                 
+#                 for nb in neighbours:
+#                     if self.lattice.nodes[nb]['colour'] == n_colour:
+#                         Q.append(nb)
+#                         cluster_size += 1
+#                     
+#                 self.lattice.nodes[Q[0]]['colour'] == 0
+#                 Q.pop(0)
+#             
+#             #if a cluster of at least 1 was found append to a list
+#             if cluster_size > 0:
+#                 Clusters.append([n_colour,cluster_size])
+#                 
+#                     
+#             self.cluster_list.append([Clusters])    
+# =============================================================================
                 
          
-         
-            
-            
-            
-        #elif self.neighbourdhood == 'Moore':
-            
-
 
 if __name__ == "__main__":
 
     plot=True
-    iterations = 2000
+    iterations = 20
     t0 = time.time()
     # if rand_dist take 1 arg, rand_dist=('uniform',) !! Comma needed here
     lattice = Lattice(size=(20,20),torus_mode=True,rand_dist=('uniform',),free_percent=0.5)
