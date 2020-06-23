@@ -12,9 +12,9 @@ import matplotlib.pyplot as plt
 import matplotlib.animation
 import networkx as nx
 if path.isdir("src"):
-    from plotting_functions import plot_setting
+    from plotting_functions import plot_setting, stacke_histo
 else:
-    from src.plotting_functions import plot_setting
+    from src.plotting_functions import plot_setting, stacke_histo
 from random import random, gauss, expovariate, shuffle
 import time
 from itertools import count
@@ -26,6 +26,7 @@ import math
 import numpy as np
 from pylab import arange
 from scipy.ndimage import measurements
+import matplotlib.animation as animation
 
 
 class Lattice():
@@ -432,7 +433,7 @@ class Lattice():
         max_age = max(self.age_dict.values())
         min_age = min(self.age_dict.values())
         # each cluster has an age range given by:
-        cluster_age_range = (max_age - min_age) // 20
+        cluster_age_range = (max_age - min_age) * self.age_fraction
 
         # make sure that in the beginning the number of groups is min 1
         if cluster_age_range == 0:
@@ -476,6 +477,8 @@ class Lattice():
             self.draw_array(group_nr=group)
             lw, num = measurements.label(self.array)
             area = measurements.sum(self.array, lw, index=arange(lw.max() + 1))
+            # make sure to not include a zero in the array
+            area =area[area != 0]
             #area_dist_per_itr = area_dist_per_itr + (list(area))
             # make sure to reset the array
             self.reset_array()
@@ -529,8 +532,18 @@ if __name__ == "__main__":
         age = lattice.plot(label='age')
         plt.colorbar(age)
         #
+
+
+
+        number_of_frames = 2000
+
+        def update_hist(num):
+            plt.cla()
+            plt.hist(np.concatenate([lattice.cluster_size[num][x] for x in lattice.cluster_size[num]]),bins=50)
+
+
+        fig = plt.figure()
+        hist = plt.hist(np.concatenate([lattice.cluster_size[0][x] for x in lattice.cluster_size[0]]),bins=50)
+
+        animation = animation.FuncAnimation(fig, update_hist, number_of_frames,interval=20)
         plt.show()
-
-        plt.close()
-
-
