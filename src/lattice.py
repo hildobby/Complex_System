@@ -7,11 +7,14 @@ This code was implemented by
 Louis Weyland, Hildebert Mouilé, Philippe Nicolau & Binjie Zhou.
 """
 
-
+from os import path
 import matplotlib.pyplot as plt
 import matplotlib.animation
 import networkx as nx
-from plotting_functions import plot_setting
+if path.isdir("src"):
+    from plotting_functions import plot_setting
+else:
+    from src.plotting_functions import plot_setting
 from random import random, gauss, expovariate, shuffle
 import time
 from itertools import count
@@ -20,7 +23,6 @@ from collections import defaultdict
 from scipy.spatial import distance
 from copy import deepcopy
 import math
-
 
 class Lattice():
     def __init__(self,size=(10,10),

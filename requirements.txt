@@ -6,3 +6,4 @@ networkx
 jupyter
 scipy
 importlib
+jupyter_contrib_nbextensions
