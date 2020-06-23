@@ -23,15 +23,21 @@ from collections import defaultdict
 from scipy.spatial import distance
 from copy import deepcopy
 import math
+import numpy as np
+from pylab import arange
+from scipy.ndimage import measurements
+
 
 class Lattice():
-    def __init__(self,size=(10,10),
+    def __init__(self, size=(10, 10),
                  rand_dist=('uniform',),
                  torus_mode=True,
                  neighbourhood='vonNeumann',
                  distance='euclidean',
                  free_percent=0.1,
-                 mutate_chance=0.5):
+                 mutate_chance=0.5,
+                 iterations=2000,
+                 age_fraction=1 / 5):
         """
         Creates the Graph
         :param size: if type is a 2d graph size needs to be tuple, if type= grid_graph size is a list []
@@ -43,19 +49,20 @@ class Lattice():
         # Characteristics of the Network
         self.size = size
         self.lattice = nx.grid_graph(list(size), periodic=torus_mode)
-        self.random_dist,*self.random_dist_specification = rand_dist
+        self.random_dist, *self.random_dist_specification = rand_dist
         self.neighbourhood = neighbourhood
-        self.distance_btw_neighbours = distance   # either "networkx" or "euclidean"
+        self.distance_btw_neighbours = distance  # either "networkx" or "euclidean"
         self.free_percent = free_percent
         self.mutate_chance = mutate_chance
-
+        self.iterations = iterations
+        self.age_fraction = age_fraction
 
         # initialising counters and single variable
         self.time_step = 0
         self.old_min_value = -1
         self.avalanche_timer = 1
-        self.age_fraction = 1/10
-        
+        # get an numpy array representation of the lattice
+        self.array = np.zeros((size[0], size[1]))
 
         # collectors
         self.min_value_list = []
@@ -63,50 +70,28 @@ class Lattice():
         self.average_fit_list = []
         self.average_age_list = []
         self.avalanche_time_list = defaultdict(list)
+        self.cluster_size = defaultdict(dict)
         self.distance_btw_mutation_list = []
         self.neighbours_list = []
         self.latest_mutation_pos_list = []
-        self.cluster_list = []
 
         # Collects the nodes that have a fitness/age/free
         self.fitness_dict = {}
         self.age_dict = {}
         self.free_dict = {}
-        
-    
-
+        self.colour_dict = {}
 
         # check for error
         self.check_error()
 
-# =============================================================================
-#     def cluster_colour(self,node):
-#         """
-#         Introduces "colour" to the nodes for the cluster analysis. 
-#         We define ranges of ages for the clustering.
-#         The variable "age_fraction" defines the size of each age range 
-#         as a fraction.
-#         """
-#         
-#         #define max & min age
-#         max_age = 20
-#         min_age = 0
-#         #each cluster has an age range given by:
-#         cluster_age_range = (max_age - min_age) * self.age_fraction
-#         
-#         self.lattice.nodes[node]['colour'] = math.ceil(self.lattice.nodes[node]['age'] / cluster_age_range)
-# =============================================================================
-        
-
-    def fitness_init(self,node):
+    def fitness_init(self, node):
         """
         Initialize the fitness values to the graph using 3 different random distribution
         uniform, exponential and gaussian
         """
         self.lattice.nodes[node]['fitness'] = random()
 
-
-    def age_init(self,node):
+    def age_init(self, node):
         """
         Assigns an age to the nodes which is defined by the last time it underwent mutation
         """
@@ -116,20 +101,26 @@ class Lattice():
         """
         Gets all the nodes that have attribute age
         """
-        self.age_dict = nx.get_node_attributes(self.lattice,'age')
+        self.age_dict = nx.get_node_attributes(self.lattice, 'age')
 
     def get_nodes_w_fitness(self):
         """
         Gets all the nodes that have attribute fitness
         """
-        self.fitness_dict = nx.get_node_attributes(self.lattice,'fitness')
+        self.fitness_dict = nx.get_node_attributes(self.lattice, 'fitness')
 
     def get_nodes_w_is_free(self):
         """
         Gets the attribute free of all the nodes since all of them
         have this attribute
         """
-        self.free_dict = nx.get_node_attributes(self.lattice,'is_free')
+        self.free_dict = nx.get_node_attributes(self.lattice, 'is_free')
+
+    def get_nodes_w_colour(self):
+        """
+        Gets the normalized age in order to get the groups
+        """
+        self.colour_dict = nx.get_node_attributes(self.lattice, 'colour')
 
     def free_init(self):
         """
@@ -144,7 +135,6 @@ class Lattice():
             else:
                 self.lattice.nodes[node]['is_free'] = True
 
-
     def update_age(self):
         """
         Update the age at each time step apart from the positions in the list pos
@@ -156,13 +146,12 @@ class Lattice():
             elif node not in self.latest_mutation_pos_list:
                 self.lattice.nodes[node]['age'] += 1
 
-
     def get_min(self):
         """
         Get the minimum fitness value and its position, add it to collector and
         add it to threshold list if it is a new max min fitness
         """
-        self.min_pos,self.min_value = min(self.fitness_dict.items(), key=lambda x: x[1])
+        self.min_pos, self.min_value = min(self.fitness_dict.items(), key=lambda x: x[1])
 
         # Add min value to collector
         self.min_value_list.append(self.min_value)
@@ -192,41 +181,31 @@ class Lattice():
         if self.neighbourhood == 'vonNeumann':
             neighbours_list = list(self.lattice.neighbors(chosen_node))
             return neighbours_list
-            # I think we can delete the line that are commented out since this function
-            # is taken into account by the periodicity function in nx.grid_graph line 42
-            # maybe Moore neighbourhood must also be change but not sure
-            #if self.min_pos[0]==0:
-            #    self.neighbours_list.append((self.size[0]-1,self.min_pos[1]))
-            #elif self.min_pos[0]==self.size[0]-1:
-            #    #print((0,self.min_pos[1]))
-            #    self.neighbours_list.append((0,self.min_pos[1]))
-           # print(self.neighbours)
-            
+
         elif self.neighbourdhood == 'Moore':
             neighbours_list = list()
             # Calculate the neighbours for this object
-            for x1 in range(-1,2):
-                for y1 in range(-1,2):
+            for x1 in range(-1, 2):
+                for y1 in range(-1, 2):
                     # Do not loop over yourself
-                    if (x1,y1)!=(0,0):
-                        x2 = (chosen_node[0]+x1)
-                        y2 = (chosen_node[1]+y1) % (self.size[0]-1)
-                        if y2>=0 and y2<=self.size[0]-1:
-                            if x2>=0 and x2<=self.size[0]-1:
-                                neighbours_list.append((x2,y2))
+                    if (x1, y1) != (0, 0):
+                        x2 = (chosen_node[0] + x1)
+                        y2 = (chosen_node[1] + y1) % (self.size[0] - 1)
+                        if y2 >= 0 and y2 <= self.size[0] - 1:
+                            if x2 >= 0 and x2 <= self.size[0] - 1:
+                                neighbours_list.append((x2, y2))
                             else:
                                 if x2 == -1:
-                                    x2=self.size[0]-1
+                                    x2 = self.size[0] - 1
                                 if x2 == self.size[0]:
-                                    x2=0
-                                neighbours_list.append((x2,y2))
-            
+                                    x2 = 0
+                                neighbours_list.append((x2, y2))
+
             return neighbours_list
 
     def mutation(self):
         """
         Mutates the position with the lowest fitness and its neighbours
-        and check the avalanche time is the max of the lowest fitness was increased
         """
         # Make sure the latest mutation list is empty every run
         # and add the ones with the minimum fitness if it is not migrating otherwise
@@ -259,10 +238,9 @@ class Lattice():
                 # check if the node has the attribute fitness
                 if node in self.fitness_dict.keys():
                     self.lattice.nodes[node]['fitness'] = gauss(self.random_dist_specification[0],
-                                                            self.random_dist_specification[1])
+                                                                self.random_dist_specification[1])
                     self.latest_mutation_pos_list.append(node)
 
-    
     def move(self):
         """
         The node with lowest fitness get moved to free place when the mean fitness of its neighbors is above the total average while lower than new neighbors
@@ -270,42 +248,40 @@ class Lattice():
         free_nodes = list(dict(filter(lambda elem: elem[1], self.free_dict.items())).keys())
         shuffle(free_nodes)
         neighbours_fitness_list = []
-        
+
         for neighbour in self.neighbours_list:
             if not self.lattice.nodes(data=True)[neighbour]['is_free']:
                 neighbours_fitness_list.append(self.lattice.nodes(data=True)[neighbour]['fitness'])
-                
+
         if neighbours_fitness_list and statistics.mean(neighbours_fitness_list) < self.average_fit:
             for free_node in free_nodes:
                 neighbours_fitness_list = []
                 for neighbour in self.get_neighbours(free_node):
                     if not self.lattice.nodes(data=True)[neighbour]['is_free']:
                         neighbours_fitness_list.append(self.lattice.nodes(data=True)[neighbour]['fitness'])
-                
+
                 if neighbours_fitness_list and statistics.mean(neighbours_fitness_list) > self.average_fit:
                     self.lattice.nodes[free_node].update(self.lattice.nodes[self.min_pos])
-                    
+
                     del self.lattice.nodes[self.min_pos]['fitness']
                     del self.lattice.nodes[self.min_pos]['age']
                     self.lattice.nodes[self.min_pos]['is_free'] = True
                     self.min_pos = free_node
-                    
+
                     self.get_nodes_w_fitness()
                     self.get_nodes_w_age()
                     self.get_nodes_w_is_free()
                     break
         self.mutation()
-        
 
     def move_or_mutate(self):
         """
         Choosing between mutating the node with the lowest fitness or moving the node to free spaces
         """
-        if random()<self.mutate_chance:
+        if random() < self.mutate_chance:
             self.mutation()
         else:
             self.move()
-
 
     def get_avalanche_time(self):
         """
@@ -314,9 +290,11 @@ class Lattice():
         the avalanche
         """
         # check if all the new mutation are above the max min fintess so if they rised the threshold
-        if not all(self.lattice.nodes[node]['fitness'] > max(self.threshold_list) for node in self.latest_mutation_pos_list):
+        if not all(self.lattice.nodes[node]['fitness'] > max(self.threshold_list) for node in
+                   self.latest_mutation_pos_list):
             self.avalanche_timer += 1
-        elif all(self.lattice.nodes[node]['fitness'] > max(self.threshold_list) for node in self.latest_mutation_pos_list):
+        elif all(self.lattice.nodes[node]['fitness'] > max(self.threshold_list) for node in
+                 self.latest_mutation_pos_list):
             self.avalanche_time_list['avalanche time'].append(self.avalanche_timer)
             self.avalanche_time_list['time_step'].append(self.time_step)
             # rest avalanche_timer
@@ -344,7 +322,7 @@ class Lattice():
         # Save current min_pos to compare to the next new min_pos
         self.old_min_value = deepcopy(self.min_pos)
 
-    def run(self,iteration):
+    def run(self):
         """
         Run the Bak-Sneppen model using the different rules
         Important to note that the order needs to be in this respective way
@@ -358,13 +336,10 @@ class Lattice():
         self.get_nodes_w_age()
         self.get_nodes_w_is_free()
 
-        for i in range(iteration):
-
-
+        for i in range(self.iterations):
             # nice if animated
-            #plt.figure()
-            #self.plot()
-
+            # plt.figure()
+            # self.plot()
 
             # get the nodes with the minimum value
             self.get_min()
@@ -377,7 +352,7 @@ class Lattice():
 
             # assign new random number to the lowest fitness and its neighbours
             #self.mutation()
-            
+
             self.move_or_mutate()
 
             # check if new mutation rise the threshold
@@ -393,16 +368,13 @@ class Lattice():
 
             # get the distance between mutations
             self.get_dist_btw_mutation()
-            
-# =============================================================================
-#             #get clusters
-#             self.get_clusters()
-# =============================================================================
+
+            # get clusters
+            self.get_clusters()
 
             self.time_step += 1
 
-
-    def plot(self,label= 'fitness'):
+    def plot(self, label='fitness'):
         """
         Visualise the graph and plot labels it labels = True
         """
@@ -413,14 +385,14 @@ class Lattice():
 
             # Get the color code and normalise it
             colors = [mapping[self.lattice.nodes[n]['fitness']] for n in nodes_fitness]
-            colors = [color/(self.size[0]*self.size[1]) for color in colors]
+            colors = [color / (self.size[0] * self.size[1]) for color in colors]
 
-            pos = dict( (n, n) for n in self.lattice.nodes())
+            pos = dict((n, n) for n in self.lattice.nodes())
             nc = nx.draw_networkx_nodes(self.lattice, pos, nodelist=nodes_fitness, node_color=colors,
-                                        with_labels=False, node_size=200,node_shape = 'h', cmap=plt.cm.jet)
-            #plt.figure()
-            #plt.colorbar(nc)
-            #plt.axis('off')
+                                        with_labels=False, node_size=200, node_shape='h', cmap=plt.cm.jet)
+            # plt.figure()
+            # plt.colorbar(nc)
+            # plt.axis('off')
 
         elif label == 'age':
             values = set(self.age_dict.values())
@@ -432,10 +404,10 @@ class Lattice():
 
             pos = dict((n, n) for n in self.lattice.nodes())
             nc = nx.draw_networkx_nodes(self.lattice, pos, nodelist=nodes_ages, node_color=colors,
-                                        with_labels=False, node_size=200,node_shape = 'h', cmap=plt.cm.gnuplot)
-            #plt.figure()
-            #plt.colorbar(nc)
-            #plt.axis('off')
+                                        with_labels=False, node_size=200, node_shape='h', cmap=plt.cm.gnuplot)
+            # plt.figure()
+            # plt.colorbar(nc)
+            # plt.axis('off')
 
         return nc
 
@@ -447,93 +419,118 @@ class Lattice():
         elif self.random_dist == 'gauss' and len(self.random_dist_specification) != 2:
             raise Exception("If distribution is set to gauss, 2 argument must be added (mean,std) !! "
                             "rand_dist=('gauss',mean,std)")
-            
-# =============================================================================
-#     def get_clusters(self):
-#         """
-#         Get clusters and respective sizes
-#         """
-#         #Empty queue for the algorithm
-#         Q = []
-#         #Empty list for each cluster
-#         Clusters = []
-#         
-#         #Assign 'colour' to every node
-#         for node in self.age_dict:
-#             self.cluster_colour(node)
-#         
-#         #Get clusters and respective sizes
-#         for node in self.age_dict:
-#             print(node)
-#             cluster_size = 0
-#             n_colour = self.lattice.nodes[node]['colour'] 
-#             if n_colour != 0:
-#                 Q.append(node)
-#                 cluster_size += 1
-#                 
-#             while len(Q) != 0:
-#                 #take first from Queue and its neighbours
-#                 neighbours = self.get_neighbours(Q[0])
-#                 
-#                 for nb in neighbours:
-#                     if self.lattice.nodes[nb]['colour'] == n_colour:
-#                         Q.append(nb)
-#                         cluster_size += 1
-#                     
-#                 self.lattice.nodes[Q[0]]['colour'] == 0
-#                 Q.pop(0)
-#             
-#             #if a cluster of at least 1 was found append to a list
-#             if cluster_size > 0:
-#                 Clusters.append([n_colour,cluster_size])
-#                 
-#                     
-#         self.cluster_list.append([Clusters])    
-#         
-# =============================================================================
-         
+
+    def cluster_colour(self, node):
+        """
+        Introduces "colour" to the nodes for the cluster analysis.
+        We define ranges of ages for the clustering.
+        The variable "age_fraction" defines the size of each age range
+        as a fraction.
+        """
+
+        # define max & min age
+        max_age = max(self.age_dict.values())
+        min_age = min(self.age_dict.values())
+        # each cluster has an age range given by:
+        cluster_age_range = (max_age - min_age) // 20
+
+        # make sure that in the beginning the number of groups is min 1
+        if cluster_age_range == 0:
+            cluster_age_range =1
+
+        self.lattice.nodes[node]['colour'] = math.ceil(self.lattice.nodes[node]['age'] / cluster_age_range)
+
+    def draw_array(self,group_nr):
+        """
+        Redraw the array with the new normalized ages
+        """
+        for coord in self.colour_dict.keys():
+            if self.colour_dict[coord] == group_nr:
+                self.array[coord[0], coord[1]] = 1
+
+    def reset_array(self):
+        """
+        Resets the array to zero since the function can't deal with it otherwise
+        """
+        self.array = np.zeros((self.size[0], self.size[1]))
+
+    def get_clusters(self):
+        """
+        Get clusters and respective sizes
+        """
+        # first regroup similar ages to same value
+        for node in self.age_dict.keys():
+            self.cluster_colour(node)
+
+        # collect in a dict all the normalised ages
+        self.get_nodes_w_colour()
+
+        # get the different groups all the different groups
+        groups = np.unique(list(lattice.colour_dict.values()))
+
+        # combine all the cluster sizes per iteration
+        area_dist_per_itr = []
+
+        # draw the array
+        for group in groups:
+            self.draw_array(group_nr=group)
+            lw, num = measurements.label(self.array)
+            area = measurements.sum(self.array, lw, index=arange(lw.max() + 1))
+            #area_dist_per_itr = area_dist_per_itr + (list(area))
+            # make sure to reset the array
+            self.reset_array()
+
+        # append it to the collector dict where each key corresponds to the time_step
+            self.cluster_size[self.time_step][group] = area
 
 if __name__ == "__main__":
 
-    plot=True
-    iterations = 20
+    plot = True
+    iterations = 2000
     t0 = time.time()
     # if rand_dist take 1 arg, rand_dist=('uniform',) !! Comma needed here
-    lattice = Lattice(size=(20,20),torus_mode=True,rand_dist=('uniform',),free_percent=0.5)
+    lattice = Lattice(size=(20, 20), torus_mode=True, rand_dist=('uniform',), free_percent=0, iterations=iterations,age_fraction=1/10)
     print(nx.info(lattice.lattice, n=None))
-    lattice.run(iteration=iterations)
+    lattice.run()
     t1 = time.time()
 
     print("The average fitness is {}".format(lattice.average_fit_list[-1]))
-    print("TOTAL TIME NEEDED {}".format(t1-t0))
+    print("TOTAL TIME NEEDED {}".format(t1 - t0))
 
     if plot:
         # make sure the default parameters are the same
         plot_setting()
         # The plotting need to be fixed
-        fig, (ax1, ax2, ax3) = plt.subplots(1,3)
-        ax1.plot(lattice.min_value_list,label='min_value')
-        ax1.plot(lattice.average_fit_list,label='average_fitness')
+        fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
+        ax1.plot(lattice.min_value_list, label='min_value')
+        ax1.plot(lattice.average_fit_list, label='average_fitness')
         ax1.legend()
         ax1.set_title('Average fitness and maximum minimum fit')
 
-        ax2.plot(lattice.avalanche_time_list['time_step'], lattice.avalanche_time_list['avalanche time'])
-        ax2.set_title('Avalanche size over time')
+        n, bins = np.histogram(lattice.avalanche_time_list['avalanche time'], density=True)
+        ax2.set_title('Avalanche size')
+        ax2.set_yscale('log')
+        ax2.set_xscale('log')
+        ax2.plot(bins[:-1], n)
 
-        ax3.hist(lattice.distance_btw_mutation_list)
+        n, bins = np.histogram(lattice.distance_btw_mutation_list, density=True)
+        ax3.plot(bins[:-1], n, 100)
         ax3.set_title('The Distribution of the distances between mutations')
-
+        ax3.set_yscale('log')
+        ax3.set_xscale('log')
 
         plt.figure()
         plt.title('Fitness Distribution')
         fitness = lattice.plot(label='fitness')
         plt.colorbar(fitness)
-
+        #
         plt.figure()
         plt.title('Age Distribution after {} itr'.format(iterations))
         age = lattice.plot(label='age')
         plt.colorbar(age)
-
+        #
         plt.show()
+
+        plt.close()
 
 
