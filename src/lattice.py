@@ -25,7 +25,7 @@ class Lattice():
     def __init__(self,size=(10,10),
                  rand_dist=('uniform',),
                  torus_mode=True,
-                 neighbourhood='vonNeumann',
+                 neighbourhood='Moore',
                  distance='euclidean',
                  free_percent=0.1,
                  mutate_chance=0.5):
@@ -61,7 +61,7 @@ class Lattice():
         self.distance_btw_mutation_list = []
         self.neighbours_list = []
         self.latest_mutation_pos_list = []
-
+        self.three_d_neighbours_list = []
         # Collects the nodes that have a fitness/age/free
         self.fitness_dict = {}
         self.age_dict = {}
@@ -166,18 +166,10 @@ class Lattice():
         if self.neighbourhood == 'vonNeumann':
             neighbours_list = list(self.lattice.neighbors(chosen_node))
             return neighbours_list
-            # I think we can delete the line that are commented out since this function
-            # is taken into account by the periodicity function in nx.grid_graph line 42
-            # maybe Moore neighbourhood must also be change but not sure
-            #if self.min_pos[0]==0:
-            #    self.neighbours_list.append((self.size[0]-1,self.min_pos[1]))
-            #elif self.min_pos[0]==self.size[0]-1:
-            #    #print((0,self.min_pos[1]))
-            #    self.neighbours_list.append((0,self.min_pos[1]))
-           # print(self.neighbours)
-            
-        elif self.neighbourdhood == 'Moore':
+
+        elif self.neighbourhood == 'Moore':
             neighbours_list = list()
+            three_d_neighbours_list = list()
             # Calculate the neighbours for this object
             for x1 in range(-1,2):
                 for y1 in range(-1,2):
@@ -194,7 +186,17 @@ class Lattice():
                                 if x2 == self.size[0]:
                                     x2=0
                                 neighbours_list.append((x2,y2))
-            
+            if self.size[2] != None:
+                for n,(x,y) in enumerate(neighbours_list):
+                    neighbours_list[n] = (x,y,chosen_node[2])
+                for (x,y,z) in neighbours_list:
+                    three_d_neighbours_list.append((chosen_node[0],chosen_node[1]+1,chosen_node[2]))
+                    three_d_neighbours_list.append((chosen_node[0],chosen_node[1]-1,chosen_node[2]))
+                    three_d_neighbours_list.append((x,y,chosen_node[2]+1))
+                    three_d_neighbours_list.append((x,y,chosen_node[2]-1))
+                    
+            neighbours_list.append(three_d_neighbours_list)
+            print(neighbours_list)
             return neighbours_list
 
     def mutation(self):
@@ -211,7 +213,7 @@ class Lattice():
             self.lattice.nodes[self.min_pos]['fitness'] = random()
             # Mutate the neighbours
             for node in self.neighbours_list:
-                if node in self.fitness_dict.keys():
+                if node in [self.fitness_dict.keys()]:
                     # check if the node has the attribute fitness
                     self.lattice.nodes[node]['fitness'] = random()
                     self.latest_mutation_pos_list.append(node)
@@ -423,7 +425,7 @@ if __name__ == "__main__":
     iterations = 2000
     t0 = time.time()
     # if rand_dist take 1 arg, rand_dist=('uniform',) !! Comma needed here
-    lattice = Lattice(size=(20,20),torus_mode=True,rand_dist=('uniform',),free_percent=0.5)
+    lattice = Lattice(size=(20,20,20),torus_mode=True,rand_dist=('uniform',),free_percent=0.5)
     print(nx.info(lattice.lattice, n=None))
     lattice.run(iteration=iterations)
     t1 = time.time()
