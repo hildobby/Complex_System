@@ -243,6 +243,9 @@ def comp_diff_neighbours(size=(20, 20),iteration = 2000,repetition = 10):
     plt.ylabel("Avalanche sizes (a.u.)")
     plt.yscale('log')
     plt.xscale('log')
+    plt.grid()
+    plt.tight_layout()
+    
     plt.show()
 
     # new figure
