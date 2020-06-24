@@ -74,6 +74,8 @@ def comp_average_fitness(size=(20, 20), iteration=2000, repetition=10, std=0.3):
     plt.title("Average Fitness over the different time step")
     plt.xlabel("Time steps (a.u.)")
     plt.ylabel("Fitness (a.u.)")
+    plt.grid()
+    plt.tight_layout()
 
     plt.show()
 
@@ -125,6 +127,9 @@ def comp_avalanche_time(size=(20, 20),iteration = 2000,repetition = 10 , std = 0
     plt.title("Avalanche sizes")
     plt.xlabel("Probability (a.u.)")
     plt.ylabel("Avalanche sizes (a.u.)")
+    plt.grid()
+    plt.tight_layout()
+    
     plt.show()
 
 
@@ -179,6 +184,9 @@ def comp_mutation_dist(size=(20, 20),iteration = 2000,repetition = 10 , std = 0.
     plt.ylabel("Distances between consecutive mutations (a.u.)")
     plt.yscale('log')
     plt.xscale('log')
+    plt.grid()
+    plt.tight_layout()
+    
     plt.show()
 
 
@@ -230,12 +238,15 @@ def comp_diff_neighbours(size=(20, 20),iteration = 2000,repetition = 10):
     powerlaw.plot_pdf(avalanche_vonNeuman_list,color='r',label='vonNeuman')
 
     #plt.plot(average_gaussian,label='Gaussian Distribution')
-    plt.legend()
-    plt.title("Avalanche sizes")
+    plt.legend(fontsize=12)
+    plt.title("Avalanche sizes", fontsize=20)
     plt.xlabel("Probability (a.u.)")
     plt.ylabel("Avalanche sizes (a.u.)")
     plt.yscale('log')
     plt.xscale('log')
+    plt.grid()
+    plt.tight_layout()
+    
     plt.show()
 
     # new figure
@@ -262,6 +273,7 @@ def comp_diff_neighbours(size=(20, 20),iteration = 2000,repetition = 10):
     plt.ylabel("Avalanche sizes (a.u.)")
     plt.yscale('log')
     plt.xscale('log')
+    plt.grid()
+    plt.tight_layout()
+    
     plt.show()
-
-comp_mutation_dist()

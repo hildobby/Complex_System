@@ -16,11 +16,10 @@ Running the model
 python3 main.py
 ```
 
-Looking at the presentation
+Generating the presentation from the `results_presentation.ipynb` Jupyter notebook
 ```
 jupyter nbconvert results_presentation.ipynb --to slides --post serve
 ```
-
 
 An overview of the results can also be found in [the Jupyter notebook file](https://github.com/hildobby/Complex_System/blob/master/results_overview.ipynb) named `results_overview.ipynb`.
 
