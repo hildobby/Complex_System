@@ -232,15 +232,18 @@ class Lattice():
                     self.latest_mutation_pos_list.append(node)
 
         elif self.random_dist == 'gauss':
-            self.lattice.nodes[self.min_pos]['fitness'] = gauss(self.random_dist_specification[0],
-                                                                self.random_dist_specification[1])
+            gaussian_random = gauss(self.lattice.nodes[self.min_pos]['fitness'],self.random_dist_specification[1])
+            if gaussian_random >= 0 and gaussian_random <= 1:
+                self.lattice.nodes[self.min_pos]['fitness'] = gaussian_random
             # Mutate the neighbours
             for node in self.neighbours_list:
                 # check if the node has the attribute fitness
                 if node in self.fitness_dict.keys():
-                    self.lattice.nodes[node]['fitness'] = gauss(self.random_dist_specification[0],
-                                                                self.random_dist_specification[1])
+                    gaussian_random = gauss(self.lattice.nodes[node]['fitness'],self.random_dist_specification[1])
+                    if gaussian_random >=0 and gaussian_random <= 1:
+                        self.lattice.nodes[node]['fitness'] = gaussian_random
                     self.latest_mutation_pos_list.append(node)
+
 
     def move(self):
         """
@@ -296,7 +299,7 @@ class Lattice():
             self.avalanche_timer += 1
         elif all(self.lattice.nodes[node]['fitness'] > max(self.threshold_list) for node in
                  self.latest_mutation_pos_list):
-            self.avalanche_time_list['avalanche time'].append(self.avalanche_timer)
+            self.avalanche_time_list['avalanche_time'].append(self.avalanche_timer)
             self.avalanche_time_list['time_step'].append(self.time_step)
             # rest avalanche_timer
             self.avalanche_timer = 1
@@ -516,7 +519,7 @@ if __name__ == "__main__":
         ax1.legend()
         ax1.set_title('Average fitness and maximum minimum fit')
 
-        n, bins = np.histogram(lattice.avalanche_time_list['avalanche time'], density=True)
+        n, bins = np.histogram(lattice.avalanche_time_list['avalanche_time'], density=True)
         ax2.set_title('Avalanche size')
         ax2.set_yscale('log')
         ax2.set_xscale('log')
