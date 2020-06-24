@@ -18,12 +18,12 @@ def plot_setting():
     """
     Change the default matplotlib parameters to make sure the graphs are unifrom
     """
-    params = {'legend.fontsize': 'x-large',
+    params = {'legend.fontsize': 12,
               'figure.figsize': (10, 6),
-              'axes.labelsize': 'x-large',
-              'axes.titlesize': 'x-large',
-              'xtick.labelsize': 'x-large',
-              'ytick.labelsize': 'x-large'}
+              'axes.labelsize': 14,
+              'axes.titlesize': 20,
+              'xtick.labelsize': 12,
+              'ytick.labelsize': 12}
     plt.rcParams.update(params)
 
 def plt_color(i):

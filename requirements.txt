@@ -6,4 +6,6 @@ networkx
 jupyter
 scipy
 importlib
-jupyter_contrib_nbextensions
+powerlaw
+mpl_toolkits
+pickle
