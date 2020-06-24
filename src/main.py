@@ -10,17 +10,13 @@ Louis Weyland, Hildebert Mouilé, Philippe Nicolau & Binjie Zhou.
 from os import path
 import matplotlib.pyplot as plt
 import matplotlib.animation
-if path.isdir("src"):
-    from src.plotting_functions import plot_setting
-    from src.lattice import Lattice
-else:
-    from plotting_functions import plot_setting
-    from lattice import Lattice
-
+from plotting_functions import plot_setting
+from lattice import Lattice
 import time
 import numpy as np
 import powerlaw
 import warnings
+import matplotlib.patches as mpatches
 warnings.filterwarnings("ignore")
 
 
@@ -327,8 +323,14 @@ def is_free_variation(i_min,i_max,i_iter):
         #plt.yscale('log')
         #sb.distplot(av_times, label= str(i), hist=True)
         plt.figure(1)
-        plt.hist(av_times, avalanche_bins, label= str(i))
-        plt.legend(loc='upper right')
+        powerlaw.plot_pdf(av_times)
+        #plt.hist(av_times, avalanche_bins, label= str(i))
+        blue = mpatches.Patch(color='b', label='0.0')
+        orange = mpatches.Patch(color='orange', label='0.2')
+        green = mpatches.Patch(color='green', label='0.4')
+        red = mpatches.Patch(color='red', label='0.6')
+        purple = mpatches.Patch(color='purple', label='0.8')
+        plt.legend(handles=[blue,orange,green,red,purple])
         
         plt.figure(2)
         plt.plot(range(len(thresholds)), thresholds, label= str(i))
