@@ -23,6 +23,8 @@ import powerlaw
 import warnings
 warnings.filterwarnings("ignore")
 
+# Automatically setting the local path to this repo for easy file writing and saving
+dir_path = path.dirname(path.realpath(__file__))
 
 def comp_average_fitness(size=(20, 20), iteration=2000, repetition=10, std=0.3):
     """
@@ -76,10 +78,10 @@ def comp_average_fitness(size=(20, 20), iteration=2000, repetition=10, std=0.3):
     plt.ylabel("Fitness (a.u.)")
     plt.grid()
     plt.tight_layout()
-
+    plt.savefig(path.join(dir_path, 'figures/average_fitness_s={}_itr={}_rep={}_std={}.png'.format(size, iteration, repetition, std)), dpi=300)
     plt.show()
 
-def comp_avalanche_time(size=(20, 20),iteration = 2000,repetition = 10 , std = 0.2):
+def comp_avalanche_time(size=(20, 20), iteration=2000, repetition=10, std=0.2):
     """
     Plots the avalanche distribution in a log-log plot
     :param : number of iterations, number of repetition and standard deviation for gaussian distribution
@@ -129,11 +131,11 @@ def comp_avalanche_time(size=(20, 20),iteration = 2000,repetition = 10 , std = 0
     plt.ylabel("Avalanche sizes (a.u.)")
     plt.grid()
     plt.tight_layout()
-    
+    plt.savefig(path.join(dir_path, 'figures/avalanche_time_s={}_itr={}_rep={}_std={}.png'.format(size, iteration, repetition, std)), dpi=300)
     plt.show()
 
 
-def comp_mutation_dist(size=(20, 20),iteration = 2000,repetition = 10 , std = 0.2):
+def comp_mutation_dist(size=(20,20), iteration=2000,repetition=10, std=0.2):
     """
     Plots the distribution between distances between mutations
     :param : size of the grid,number of iterations, number of repetition and standard deviation for gaussian distribution
@@ -186,12 +188,12 @@ def comp_mutation_dist(size=(20, 20),iteration = 2000,repetition = 10 , std = 0.
     plt.xscale('log')
     plt.grid()
     plt.tight_layout()
-    
+    plt.savefig(path.join(dir_path, 'figures/mutation_distance_s={}_itr={}_rep={}_std={}.png'.format(size, iteration, repetition, std)), dpi=300)
     plt.show()
 
 
 
-def comp_diff_neighbours(size=(20, 20),iteration = 2000,repetition = 10):
+def comp_diff_neighbours(size=(20,20), iteration=2000, repetition=10):
     """
     Plots the avalanche distribution in a log-log plot
     :param : number of iterations, number of repetition and standard deviation for gaussian distribution
@@ -275,12 +277,12 @@ def comp_diff_neighbours(size=(20, 20),iteration = 2000,repetition = 10):
     plt.xscale('log')
     plt.grid()
     plt.tight_layout()
-    
+    plt.savefig(path.join(dir_path, 'figures/diff_neighbours_s={}_itr={}_rep={}.png'.format(size, iteration, repetition)), dpi=300)
     plt.show()
     
     
     
-def is_free_variation(i_min,i_max,i_iter):
+def is_free_variation(i_min=0, i_max=1, i_iter=6):
     '''
     runs several instances of the lattice 
     with different percentages of empty nodes in the lattice.
@@ -333,7 +335,8 @@ def is_free_variation(i_min,i_max,i_iter):
         plt.figure(2)
         plt.plot(range(len(thresholds)), thresholds, label= str(i))
         plt.legend(loc='upper right')
-        
+    
+    plt.grid()
+    plt.tight_layout()
+    plt.savefig(path.join(dir_path, 'figures/free_variation_imin={}_imax={}_iterations={}.png'.format(i_min, i_max, i_iter)), dpi=300)
     plt.show()
-        
-        
