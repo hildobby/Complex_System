@@ -37,7 +37,6 @@ def comp_average_fitness(size=(20, 20),iteration = 2000,repetition = 10 , std = 
     threshold_gaussian = []
 
     for i in range(repetition):
-        print("Repetiton {}".format(i))
 
         uniform = Lattice(size=size, torus_mode=True, rand_dist=('uniform',), free_percent=0, iterations=iterations,
                           age_fraction=1 / 10)
@@ -89,8 +88,6 @@ def comp_avalanche_time(size=(20, 20),iteration = 2000,repetition = 10 , std = 0
     avalanche_gaussian_list = []
 
     for i in range(repetition):
-        print("Repetiton {}".format(i))
-
         uniform = Lattice(size=size, torus_mode=True, rand_dist=('uniform',), free_percent=0, iterations=iterations,
                           age_fraction=1 / 10)
         gaussian = Lattice(size=size, torus_mode=True, rand_dist=('gauss', 0.5, std), free_percent=0,
@@ -163,4 +160,3 @@ def comp_mutation_dist(size=(20, 20),iteration = 2000,repetition = 10 , std = 0.
     plt.show()
 
 
-comp_average_fitness()
