@@ -546,7 +546,7 @@ if __name__ == "__main__":
         #
 
 
-
+        """
         number_of_frames = 2000
 
         def update_hist(num):
@@ -559,3 +559,4 @@ if __name__ == "__main__":
 
         animation = animation.FuncAnimation(fig, update_hist, number_of_frames,interval=20)
         plt.show()
+        """

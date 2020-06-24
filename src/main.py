@@ -177,7 +177,6 @@ def comp_mutation_dist(size=(20, 20),iteration = 2000,repetition = 10 ,std = 0.2
     plt.plot(bins_uniform[:-1], n_uniform,label='Uniform Distribution')
     plt.plot(bins_gaussian[:-1], n_gaussian,label='Gaussian Distribution')
 
-    # plt.plot(average_gaussian,label='Gaussian Distribution')
     plt.legend()
     plt.title("Distribution of the distances between consecutive mutations")
     plt.xlabel("Probability (a.u.)")
@@ -260,23 +259,21 @@ def comp_diff_neighbours(size=(20, 20),iteration = 2000,repetition = 10):
     print("If {} > 0, the distribution of the data with Moore neighbourhood resembles more a powerlaw than exponential distribution \n"
           "with a p value of {}".format(R_vonNeumann,p_vonNeumann))
 
-    #n_moore, bins_moore = np.histogram(avalanche_moore_list, density=True)
-    #n_gaussian, bins_gaussian = np.histogram(avalanche_gaussian_list, density=True)
+    n_moore, bins_moore = np.histogram( mutation_dist_moore_list, density=True)
+    n_vonNeumann, bins_vonNeumann = np.histogram( mutation_dist_vonNeumann_list, density=True)
 
     # plot for comparision
     plot_setting()
-    #plt.plot(bins_uniform[:-1], n_uniform,label='Uniform Distribution')
-    #plt.plot(bins_gaussian[:-1], n_gaussian,label='Gaussian Distribution')
-    powerlaw.plot_pdf(mutation_dist_moore_list, color='b',label='Moore')
-    powerlaw.plot_pdf(mutation_dist_vonNeumann_list,color='r',label='vonNeuman')
+    plt.plot(bins_moore[:-1], n_moore,label='Moore Neighbourhood')
+    plt.plot(bins_vonNeumann[:-1], n_vonNeumann,label='vonNeumann Neighbourhood')
 
-    #plt.plot(average_gaussian,label='Gaussian Distribution')
     plt.legend()
-    plt.title("Avalanche sizes")
+    plt.title("Distribution of the distances between consecutive mutations")
     plt.xlabel("Probability (a.u.)")
-    plt.ylabel("Avalanche sizes (a.u.)")
+    plt.ylabel("Distances between consecutive mutations (a.u.)")
     plt.yscale('log')
     plt.xscale('log')
+    plt.grid()
+    plt.tight_layout()
     plt.show()
 
-comp_average_fitness(iteration=2000)
