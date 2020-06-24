@@ -18,7 +18,7 @@ python3 main.py
 
 Looking at the presentation
 ```
-jupyter nbconvert Jupyter\ Slides.ipynb --to slides --post serve
+jupyter nbconvert results_presentation.ipynb --to slides --post serve
 ```
 
 
