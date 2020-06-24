@@ -11,11 +11,11 @@ from os import path
 import matplotlib.pyplot as plt
 import matplotlib.animation
 if path.isdir("src"):
-    from plotting_functions import plot_setting
-    from lattice.py import Lattice
-else:
     from src.plotting_functions import plot_setting
     from src.lattice import Lattice
+else:
+    from plotting_functions import plot_setting
+    from lattice import Lattice
 
 import time
 import numpy as np
