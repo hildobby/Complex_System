@@ -12,9 +12,9 @@ import matplotlib.pyplot as plt
 import matplotlib.animation
 import networkx as nx
 if path.isdir("src"):
-    from plotting_functions import plot_setting, stacke_histo
+    from plotting_functions import plot_setting
 else:
-    from src.plotting_functions import plot_setting, stacke_histo
+    from src.plotting_functions import plot_setting
 from random import random, gauss, expovariate, shuffle
 import time
 from itertools import count
@@ -323,7 +323,7 @@ class Lattice():
         # Save current min_pos to compare to the next new min_pos
         self.old_min_value = deepcopy(self.min_pos)
 
-    def run(self):
+    def run(self,things_to_collect):
         """
         Run the Bak-Sneppen model using the different rules
         Important to note that the order needs to be in this respective way
@@ -352,15 +352,19 @@ class Lattice():
             self.neighbours_list = self.get_neighbours(self.min_pos)
 
             # assign new random number to the lowest fitness and its neighbours
-            #self.mutation()
+            if "mutation" in things_to_collect or "all" in things_to_collect:
+                self.mutation()
 
-            self.move_or_mutate()
+            if "moving" in things_to_collect or "all" in things_to_collect:
+                self.move_or_mutate()
 
             # check if new mutation rise the threshold
-            self.get_avalanche_time()
+            if "avalanche_time" in things_to_collect or "all" in things_to_collect:
+                self.get_avalanche_time()
 
             # set the age of the nodes accordingly and needs to be placed after self.get_avalanche_time()
-            self.update_age()
+            if "update_age" in things_to_collect or "all" in things_to_collect:
+                self.update_age()
 
             # update the dicts after mutation
             self.get_nodes_w_fitness()
@@ -368,10 +372,12 @@ class Lattice():
             self.get_nodes_w_is_free()
 
             # get the distance between mutations
-            self.get_dist_btw_mutation()
+            if "get_dist_btw_mutation" in things_to_collect or "all" in things_to_collect:
+                self.get_dist_btw_mutation()
 
             # get clusters
-            self.get_clusters()
+            if "get_cluster" in things_to_collect or "all" in things_to_collect:
+                self.get_clusters()
 
             self.time_step += 1
 
@@ -467,7 +473,7 @@ class Lattice():
         self.get_nodes_w_colour()
 
         # get the different groups all the different groups
-        groups = np.unique(list(lattice.colour_dict.values()))
+        groups = np.unique(list(self.colour_dict.values()))
 
         # combine all the cluster sizes per iteration
         area_dist_per_itr = []
@@ -494,7 +500,7 @@ if __name__ == "__main__":
     # if rand_dist take 1 arg, rand_dist=('uniform',) !! Comma needed here
     lattice = Lattice(size=(20, 20), torus_mode=True, rand_dist=('uniform',), free_percent=0, iterations=iterations,age_fraction=1/10)
     print(nx.info(lattice.lattice, n=None))
-    lattice.run()
+    lattice.run(["all"])
     t1 = time.time()
 
     print("The average fitness is {}".format(lattice.average_fit_list[-1]))

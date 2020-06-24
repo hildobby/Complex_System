@@ -13,28 +13,6 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.collections import PolyCollection
 from matplotlib.colors import LinearSegmentedColormap
 
-def stacke_histo(dict):
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-
-    colors = LinearSegmentedColormap('colormap', cm.jet._segmentdata.copy(), len(dict))
-
-
-    poly = PolyCollection(verts, facecolors = [colors(i) for i in range(n)])
-    poly.set_alpha(0.7)
-    ax.add_collection3d(poly, zs=np.arange(len(dict)), zdir='y')
-
-    ax.set_xlabel('CD4-PE')
-    #ax.set_xlim3d(0, p)
-    ax.set_ylabel('Sample')
-    #ax.set_ylim3d(0,n)
-    ax.set_zlabel('Counts')
-    #ax.set_zlim3d(0, 1.2*maxz)
-
-    #plt.savefig('3d_hist.png')
-    plt.show()
-
-
 
 def plot_setting():
     """
