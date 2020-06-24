@@ -67,7 +67,7 @@ class Lattice():
 
         # collectors
         self.min_value_list = []
-        self.threshold_list = []
+        self.threshold_list = defaultdict(list)
         self.average_fit_list = []
         self.average_age_list = []
         self.avalanche_time_list = defaultdict(list)
@@ -159,9 +159,11 @@ class Lattice():
 
         # check whatever the list is empty if not append only new maximum threshold
         if not self.threshold_list:
-            self.threshold_list.append(self.min_value)
-        elif self.min_value > max(self.threshold_list):
-            self.threshold_list.append(self.min_value)
+            self.threshold_list['threshold'].append(self.min_value)
+            self.threshold_list['time_step'].append(self.time_step)
+        elif self.min_value > max(self.threshold_list['threshold']):
+            self.threshold_list['threshold'].append(self.min_value)
+            self.threshold_list['time_step'].append(self.time_step)
 
     def get_average(self):
         """
@@ -176,6 +178,7 @@ class Lattice():
         self.average_age_list.append(self.average_age)
 
     def get_neighbours(self, chosen_node):
+
         """
         Get the neighbours of the given node and return self.neighbours which is a list of tuples
         """
@@ -183,7 +186,7 @@ class Lattice():
             neighbours_list = list(self.lattice.neighbors(chosen_node))
             return neighbours_list
 
-        elif self.neighbourdhood == 'Moore':
+        elif self.neighbourhood == 'Moore':
             neighbours_list = list()
             # Calculate the neighbours for this object
             for x1 in range(-1, 2):
@@ -294,10 +297,10 @@ class Lattice():
         the avalanche
         """
         # check if all the new mutation are above the max min fintess so if they rised the threshold
-        if not all(self.lattice.nodes[node]['fitness'] > max(self.threshold_list) for node in
+        if not all(self.lattice.nodes[node]['fitness'] > max(self.threshold_list['threshold']) for node in
                    self.latest_mutation_pos_list):
             self.avalanche_timer += 1
-        elif all(self.lattice.nodes[node]['fitness'] > max(self.threshold_list) for node in
+        elif all(self.lattice.nodes[node]['fitness'] > max(self.threshold_list['threshold']) for node in
                  self.latest_mutation_pos_list):
             self.avalanche_time_list['avalanche_time'].append(self.avalanche_timer)
             self.avalanche_time_list['time_step'].append(self.time_step)
@@ -498,7 +501,7 @@ class Lattice():
 if __name__ == "__main__":
 
     plot = True
-    iterations = 2000
+    iterations = 20
     t0 = time.time()
     # if rand_dist take 1 arg, rand_dist=('uniform',) !! Comma needed here
     lattice = Lattice(size=(20, 20), torus_mode=True, rand_dist=('uniform',), free_percent=0, iterations=iterations,age_fraction=1/10)
@@ -543,7 +546,7 @@ if __name__ == "__main__":
         #
 
 
-
+        """
         number_of_frames = 2000
 
         def update_hist(num):
@@ -556,3 +559,4 @@ if __name__ == "__main__":
 
         animation = animation.FuncAnimation(fig, update_hist, number_of_frames,interval=20)
         plt.show()
+        """

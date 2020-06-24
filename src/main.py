@@ -53,8 +53,8 @@ def comp_average_fitness(size=(20, 20), iteration=2000, repetition=10, std=0.3):
 
         uniform_list.append(uniform.average_fit_list)
         gaussian_list.append(gaussian.average_fit_list)
-        threshold_uniform = threshold_uniform + uniform.threshold_list
-        threshold_gaussian = threshold_gaussian + gaussian.threshold_list
+        threshold_uniform = threshold_uniform + uniform.threshold_list['threshold']
+        threshold_gaussian = threshold_gaussian + gaussian.threshold_list['threshold']
 
     # get the average
     average_uniform = np.average(uniform_list,axis=0)
@@ -179,7 +179,6 @@ def comp_mutation_dist(size=(20,20), iteration=2000,repetition=10, std=0.2):
     plt.plot(bins_uniform[:-1], n_uniform,label='Uniform Distribution')
     plt.plot(bins_gaussian[:-1], n_gaussian,label='Gaussian Distribution')
 
-    # plt.plot(average_gaussian,label='Gaussian Distribution')
     plt.legend()
     plt.title("Distribution of the distances between consecutive mutations")
     plt.xlabel("Probability (a.u.)")
@@ -206,42 +205,41 @@ def comp_diff_neighbours(size=(20,20), iteration=2000, repetition=10):
     mutation_dist_vonNeumann_list = []
     mutation_dist_moore_list = []
     avalanche_moore_list = []
-    avalanche_gaussian_list = []
+    avalanche_vonNeumann_list = []
 
     for i in range(repetition):
-        moore = Lattice(size=size, torus_mode=True, rand_dist=('uniform',), free_percent=0, iterations=iterations,
-                            neighbourhood='Moore')
-        vonNeumann = Lattice(size=size, torus_mode=True, rand_dist=('uniform',), free_percent=0,
-                          iterations=iterations,neighbourhood='vonNeumann')
+        moore = Lattice(size=size, torus_mode=True,neighbourhood='Moore', rand_dist=('uniform',), free_percent=0, iterations=iterations,
+                        )
+        vonNeumann = Lattice(size=size, torus_mode=True,neighbourhood='vonNeumann', rand_dist=('uniform',), free_percent=0,
+                          iterations=iterations,)
 
         moore.run(["mutation","avalanche_time","get_dist_btw_mutation"])
         vonNeumann.run(["mutation","avalanche_time","get_dist_btw_mutation"])
 
-        avalanche_moore_list = avalanche_moore_list+ moore.avalanche_time_list['avalanche_time']
-        avalanche_vonNeumann_list = avalanche_gaussian_list + gaussian.avalanche_time_list['avalanche_time']
+        avalanche_moore_list = avalanche_moore_list + moore.avalanche_time_list['avalanche_time']
+        avalanche_vonNeumann_list = avalanche_vonNeumann_list + vonNeumann.avalanche_time_list['avalanche_time']
 
         mutation_dist_moore_list =  mutation_dist_moore_list + moore.distance_btw_mutation_list
         mutation_dist_vonNeumann_list = mutation_dist_vonNeumann_list + vonNeumann.distance_btw_mutation_list
 
     result_moore = powerlaw.Fit(avalanche_moore_list,discrete = True)
-    R_m, p = fit.distribution_compare('power_law', 'exponential', normalized_ratio = True)
+    R_moore, p_moore = result_moore.distribution_compare('power_law', 'exponential', normalized_ratio = True)
     result_vonNeumann = powerlaw.Fit(avalanche_vonNeumann_list, discrete = True)
-    print("The slope with a unifrom distribtion is {}".fromat(result_moore.power_law.alpha))
-    print("The slope with a Gaussian distribtion is {}".fromat(result_vonNeumann.power_law.alpha))
-
-    #n_moore, bins_moore = np.histogram(avalanche_moore_list, density=True)
-    #n_gaussian, bins_gaussian = np.histogram(avalanche_gaussian_list, density=True)
+    R_vonNeumann, p_vonNeumann = result_vonNeumann.distribution_compare('power_law', 'exponential', normalized_ratio=True)
+    print("The slope with a unifrom distribtion is {}".format(result_moore.power_law.alpha))
+    print("If {} > 0, the distribution of the data with Moore neighbourhood resembles more a powerlaw than exponential distribution \n"
+          "with a p value of {}".format(R_moore,p_moore))
+    print("The slope with a Gaussian distribtion is {}".format(result_vonNeumann.power_law.alpha))
+    print("If {} > 0, the distribution of the data with Moore neighbourhood resembles more a powerlaw than exponential distribution \n"
+          "with a p value of {}".format(R_vonNeumann,p_vonNeumann))
 
     # plot for comparision
     plot_setting()
-    #plt.plot(bins_uniform[:-1], n_uniform,label='Uniform Distribution')
-    #plt.plot(bins_gaussian[:-1], n_gaussian,label='Gaussian Distribution')
     powerlaw.plot_pdf(avalanche_moore_list, color='b',label='Moore')
-    powerlaw.plot_pdf(avalanche_vonNeuman_list,color='r',label='vonNeuman')
+    powerlaw.plot_pdf(avalanche_vonNeumann_list,color='r',label='vonNeuman')
 
-    #plt.plot(average_gaussian,label='Gaussian Distribution')
-    plt.legend(fontsize=12)
-    plt.title("Avalanche sizes", fontsize=20)
+    plt.legend()
+    plt.title("Avalanche sizes")
     plt.xlabel("Probability (a.u.)")
     plt.ylabel("Avalanche sizes (a.u.)")
     plt.yscale('log')
@@ -253,26 +251,28 @@ def comp_diff_neighbours(size=(20,20), iteration=2000, repetition=10):
 
     # new figure
     result_moore = powerlaw.Fit(mutation_dist_moore_list,discrete = True)
-    R_m, p = fit.distribution_compare('power_law', 'exponential', normalized_ratio = True)
+    R_moore, p_moore = result_moore.distribution_compare('power_law', 'exponential', normalized_ratio = True)
     result_vonNeumann = powerlaw.Fit(mutation_dist_vonNeumann_list, discrete = True)
-    print("The slope with Moore Neighbourhood is {}".fromat(result_moore.power_law.alpha))
-    print("The slope with a vonNeumann Neighbourhood is {}".fromat(result_vonNeumann.power_law.alpha))
+    R_vonNeumann, p_vonNeumann = result_vonNeumann.distribution_compare('power_law', 'exponential', normalized_ratio=True)
+    print("The slope with a unifrom distribtion is {}".format(result_moore.power_law.alpha))
+    print("If {} > 0, the distribution of the data with Moore neighbourhood resembles more a powerlaw than exponential distribution \n"
+          "with a p value of {}".format(R_moore,p_moore))
+    print("The slope with a Gaussian distribtion is {}".format(result_vonNeumann.power_law.alpha))
+    print("If {} > 0, the distribution of the data with Moore neighbourhood resembles more a powerlaw than exponential distribution \n"
+          "with a p value of {}".format(R_vonNeumann,p_vonNeumann))
 
-    #n_moore, bins_moore = np.histogram(avalanche_moore_list, density=True)
-    #n_gaussian, bins_gaussian = np.histogram(avalanche_gaussian_list, density=True)
+    n_moore, bins_moore = np.histogram( mutation_dist_moore_list, density=True)
+    n_vonNeumann, bins_vonNeumann = np.histogram( mutation_dist_vonNeumann_list, density=True)
 
     # plot for comparision
     plot_setting()
-    #plt.plot(bins_uniform[:-1], n_uniform,label='Uniform Distribution')
-    #plt.plot(bins_gaussian[:-1], n_gaussian,label='Gaussian Distribution')
-    powerlaw.plot_pdf(avalanche_moore_list, color='b',label='Moore')
-    powerlaw.plot_pdf(avalanche_vonNeuman_list,color='r',label='vonNeuman')
+    plt.plot(bins_moore[:-1], n_moore,label='Moore Neighbourhood')
+    plt.plot(bins_vonNeumann[:-1], n_vonNeumann,label='vonNeumann Neighbourhood')
 
-    #plt.plot(average_gaussian,label='Gaussian Distribution')
     plt.legend()
-    plt.title("Avalanche sizes")
+    plt.title("Distribution of the distances between consecutive mutations")
     plt.xlabel("Probability (a.u.)")
-    plt.ylabel("Avalanche sizes (a.u.)")
+    plt.ylabel("Distances between consecutive mutations (a.u.)")
     plt.yscale('log')
     plt.xscale('log')
     plt.grid()
