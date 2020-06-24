@@ -12,9 +12,9 @@ import matplotlib.pyplot as plt
 import matplotlib.animation
 import networkx as nx
 if path.isdir("src"):
-    from plotting_functions import plot_setting
-else:
     from src.plotting_functions import plot_setting
+else:
+    from plotting_functions import plot_setting
 from random import random, gauss, expovariate, shuffle
 import time
 from itertools import count

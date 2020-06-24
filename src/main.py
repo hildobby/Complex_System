@@ -11,11 +11,11 @@ from os import path
 import matplotlib.pyplot as plt
 import matplotlib.animation
 if path.isdir("src"):
-    from plotting_functions import plot_setting
-    from lattice.py import Lattice
-else:
     from src.plotting_functions import plot_setting
     from src.lattice import Lattice
+else:
+    from plotting_functions import plot_setting
+    from lattice import Lattice
 
 import time
 import numpy as np
@@ -24,7 +24,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 
-def comp_average_fitness(size=(20, 20),iteration = 2000,repetition = 10 , std = 0.3):
+def comp_average_fitness(size=(20, 20), iteration=2000, repetition=10, std=0.3):
     """
     Plots the average fintess for different distribution and the threshold
     :param : number of iterations, number of repetition and standard deviation for gaussian distribution
@@ -63,6 +63,7 @@ def comp_average_fitness(size=(20, 20),iteration = 2000,repetition = 10 , std = 
 
     # plot for comparision
     plot_setting()
+
     plt.plot(average_uniform,label='Uniform Distribution')
     plt.plot(average_gaussian,label='Gaussian Distribution')
     plt.plot(np.linspace(0,len(average_uniform),len(average_uniform)),threshold_bar_uniform,label='Threshold for Uniform Distribution')
@@ -126,7 +127,6 @@ def comp_avalanche_time(size=(20, 20),iteration = 2000,repetition = 10 , std = 0
     plt.ylabel("Avalanche sizes (a.u.)")
     plt.show()
 
-    return  result_gaussian,result_uniform,avalanche_uniform_list
 
 def comp_mutation_dist(size=(20, 20),iteration = 2000,repetition = 10 , std = 0.2):
     """
