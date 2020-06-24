@@ -277,3 +277,63 @@ def comp_diff_neighbours(size=(20, 20),iteration = 2000,repetition = 10):
     plt.tight_layout()
     
     plt.show()
+    
+    
+    
+def is_free_variation(i_min,i_max,i_iter):
+    '''
+    runs several instances of the lattice 
+    with different percentages of empty nodes in the lattice.
+    avalanche time and thresholds are then compared between runs.
+    ____
+    
+    i_min: lower percentage of the range (within [0,1])
+    i_max: upper percentage (within [0,1])
+    i_iter: number of steps between i_min and i_max to be taken (Integer)
+    '''
+# =============================================================================
+#     #list of thresholds
+#     free_thresh = []
+#     #list of avalanche times
+#     free_avalanche = []
+# =============================================================================
+    
+    
+    #figure & settings for plots
+    plot_setting()
+    plt.figure(1) 
+    plt.title('Avalanche times for different percentages of empty space in the lattice')
+    plt.xlabel('Avalanche Time')
+    plt.ylabel('Instances')
+    plt.figure(2)
+    plt.title('Threshold values for different percentages of empty space in the lattice')
+    
+
+    #looping over the different percentages
+    for i in np.linspace(i_min,i_max,i_iter):
+        
+        i = round(i,1)
+        free_iter = Lattice(size=(20, 20), torus_mode=True, rand_dist=('uniform',), free_percent=i, iterations=iterations,
+                      age_fraction=1 / 10)
+        free_iter.run("all")
+        
+        av_times = free_iter.avalanche_time_list['avalanche_time']
+        thresholds = free_iter.threshold_list
+        
+        avalanche_bins = range(min(av_times),max(av_times)+1)
+        threshold_bins = np.linspace(min(thresholds),max(thresholds),len(thresholds))
+        
+        #plt.xscale('log')
+        #plt.yscale('log')
+        #sb.distplot(av_times, label= str(i), hist=True)
+        plt.figure(1)
+        plt.hist(av_times, avalanche_bins, label= str(i))
+        plt.legend(loc='upper right')
+        
+        plt.figure(2)
+        plt.plot(range(len(thresholds)), thresholds, label= str(i))
+        plt.legend(loc='upper right')
+        
+    plt.show()
+        
+        
