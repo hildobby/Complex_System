@@ -21,7 +21,7 @@ import time
 import numpy as np
 
 
-def comp_average_fitness(size=(20, 20),iteration = 2000,repetition = 10 , std = 0.3):
+def comp_average_fitness(size=(20, 20), iteration=2000, repetition=10, std=0.3):
     """
     Plots the average fintess for different distribution and the threshold
     :param : number of iterations, number of repetition and standard deviation for gaussian distribution
@@ -67,14 +67,16 @@ def comp_average_fitness(size=(20, 20),iteration = 2000,repetition = 10 , std = 
     plt.plot(np.linspace(0,len(average_gaussian),len(average_gaussian)),threshold_bar_gaussian,
              label='Threshold for Gaussian Distribution with std ={}'.format(std))
 
-    plt.legend()
-    plt.title("Average Fitness over the different time step")
-    plt.xlabel("Time steps (a.u.)")
-    plt.ylabel("Fitness (a.u.)")
-
+    plt.legend(fontsize=10)
+    plt.title("Average Fitness over the different time step", fontsize=20)
+    plt.xlabel("Time steps (a.u.)", fontsize=14)
+    plt.ylabel("Fitness (a.u.)", fontsize=14)
+    plt.xlim(0, iteration)
+    plt.tight_layout()
+    plt.grid()
     plt.show()
 
-def comp_avalanche_time(size=(20, 20),iteration = 2000,repetition = 10 , std = 0.2):
+def comp_avalanche_time(size=(20,20), iteration=2000, repetition=10, std=0.2):
     """
     Plots the avalanche distribution in a log-log plot
     :param : number of iterations, number of repetition and standard deviation for gaussian distribution
@@ -108,16 +110,18 @@ def comp_avalanche_time(size=(20, 20),iteration = 2000,repetition = 10 , std = 0
     plt.plot(bins_gaussian[:-1], n_gaussian,label='Gaussian Distribution')
 
     #plt.plot(average_gaussian,label='Gaussian Distribution')
-    plt.legend()
-    plt.title("Avalanche sizes")
-    plt.xlabel("Probability (a.u.)")
-    plt.ylabel("Avalanche sizes (a.u.)")
+    plt.legend(fontsize=10)
+    plt.title("Avalanche sizes", fontsize=20)
+    plt.xlabel("Probability (a.u.)", fontsize=14)
+    plt.ylabel("Avalanche sizes (a.u.)", fontsize=14)
     plt.yscale('log')
     plt.xscale('log')
+    plt.tight_layout()
+    plt.grid()
     plt.show()
 
 
-def comp_mutation_dist(size=(20, 20),iteration = 2000,repetition = 10 , std = 0.2):
+def comp_mutation_dist(size=(20,20), iteration=2000, repetition=10, std=0.2):
     """
     Plots the distribution between distances between mutations
     :param : size of the grid,number of iterations, number of repetition and standard deviation for gaussian distribution
@@ -151,12 +155,12 @@ def comp_mutation_dist(size=(20, 20),iteration = 2000,repetition = 10 , std = 0.
     plt.plot(bins_gaussian[:-1], n_gaussian, label='Gaussian Distribution')
 
     # plt.plot(average_gaussian,label='Gaussian Distribution')
-    plt.legend()
-    plt.title("Distribution of the distances between consecutive mutations")
-    plt.xlabel("Probability (a.u.)")
-    plt.ylabel("Distances between consecutive mutations (a.u.)")
+    plt.legend(fontsize=10)
+    plt.title("Distribution of the distances between consecutive mutations", fontsize=20)
+    plt.xlabel("Probability (a.u.)", fontsize=14)
+    plt.ylabel("Distances between consecutive mutations (a.u.)", fontsize=14)
     plt.yscale('log')
     plt.xscale('log')
+    plt.tight_layout()
+    plt.grid()
     plt.show()
-
-
