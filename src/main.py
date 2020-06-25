@@ -244,7 +244,7 @@ def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
         vonNeumann = Lattice(
             size=size,
             torus_mode=True,
-            neighbourhood='vonNeumann',
+            neighbourhood='von Neumann',
             rand_dist=(
                 'uniform',
             ),
@@ -253,7 +253,7 @@ def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
         )
         moore = Lattice(size=size, torus_mode=True,neighbourhood='Moore', rand_dist=('uniform',), free_percent=0, iterations=iterations,
                         )
-        vonNeumann = Lattice(size=(50,50), torus_mode=True,neighbourhood='vonNeumann', rand_dist=('uniform',), free_percent=0,
+        vonNeumann = Lattice(size=(50,50), torus_mode=True,neighbourhood='von Neumann', rand_dist=('uniform',), free_percent=0,
                           iterations=iterations,)
 
         moore.run(["mutation", "avalanche_time", "get_dist_btw_mutation"])
@@ -274,7 +274,7 @@ def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
     # plot for comparision
     plot_setting()
     powerlaw.plot_pdf(avalanche_moore_list, color='b', label='Moore')
-    powerlaw.plot_pdf(avalanche_vonNeumann_list, color='r', label='vonNeuman')
+    powerlaw.plot_pdf(avalanche_vonNeumann_list, color='r', label='von Neumann')
 
     plt.legend()
     plt.title("Avalanche sizes")
@@ -296,7 +296,7 @@ def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
 
 
     print_statement(result_moore.power_law.alpha,  R_moore,p_moore, "More Neighbour")
-    print_statement(result_vonNeumann.power_law.alpha, R_vonNeumann,p_vonNeumann, "vonNeumann Neighbourhood")
+    print_statement(result_vonNeumann.power_law.alpha, R_vonNeumann,p_vonNeumann, "von Neumann Neighbourhood")
 
 
     n_moore, bins_moore = np.histogram(mutation_dist_moore_list, density=True)
@@ -305,7 +305,7 @@ def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
     # plot for comparision
     plot_setting()
     plt.plot(bins_moore[:-1], n_moore, label='Moore Neighbourhood')
-    plt.plot(bins_vonNeumann[:-1], n_vonNeumann, label='vonNeumann Neighbourhood')
+    plt.plot(bins_vonNeumann[:-1], n_vonNeumann, label='von Neumann Neighbourhood')
 
     plt.legend()
     plt.title("Distribution of the distances between consecutive mutations")
@@ -319,7 +319,7 @@ def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
     plt.show()
 
     print_statement(result_moore.power_law.alpha,  R_moore,p_moore, "More Neighbour")
-    print_statement(result_vonNeumann.power_law.alpha, R_vonNeumann,p_vonNeumann, "vonNeumann")
+    print_statement(result_vonNeumann.power_law.alpha, R_vonNeumann,p_vonNeumann, 'von Neumann')
 
 def is_free_variation(i_min=0, i_max=1, i_iter=6, iterations=2000):
     '''
@@ -520,10 +520,11 @@ def comp_diff_dim(iterations = 2000):
 
     # plot the power law
     plot_setting()
-    plt.figure()
-    plt.title("Cluster Distribution for 2D and 3D")
     powerlaw.plot_pdf(grid_hist,label='2 Dimensions')
     powerlaw.plot_pdf(cube_hist,label = '3 Dimensions')
+    plt.title("Cluster Distribution for 2D and 3D")
+    plt.xlabel("Cluster size (a.u.)")
+    plt.ylabel("Probability (a.u.)")
     plt.grid()
     plt.legend()
     plt.tight_layout()
@@ -533,3 +534,4 @@ def comp_diff_dim(iterations = 2000):
     print_statement(cube_results.power_law.alpha, r_cube, p_cube, "3D")
 
 
+is_free_variation()

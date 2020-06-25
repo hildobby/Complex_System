@@ -35,7 +35,7 @@ class Lattice():
     def __init__(self, size=(10, 10),
                  rand_dist=('uniform',),
                  torus_mode=True,
-                 neighbourhood='vonNeumann',
+                 neighbourhood='von Neumann',
                  distance='euclidean',
                  free_percent=0.1,
                  mutate_chance=0.5,
@@ -183,7 +183,7 @@ class Lattice():
         """
         Get the neighbours of the given node and return self.neighbours which is a list of tuples
         """
-        if self.neighbourhood == 'vonNeumann':
+        if self.neighbourhood == 'von Neumann':
             neighbours_list = list(self.lattice.neighbors(chosen_node))
             return neighbours_list
 
