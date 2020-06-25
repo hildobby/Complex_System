@@ -344,7 +344,7 @@ def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
             p_vonNeumann))
 
 
-def is_free_variation(i_min=0, i_max=1, i_iter=6):
+def is_free_variation(i_min=0, i_max=1, i_iter=6, iterations = 2000):
     '''
     runs several instances of the lattice
     with different percentages of empty nodes in the lattice.
