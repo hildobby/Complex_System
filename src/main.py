@@ -6,10 +6,11 @@ Created on Tuesday June 16 2020
 This code was implemented by
 Louis Weyland, Hildebert Mouilé, Philippe Nicolau & Binjie Zhou.
 """
-
+import sys, os
 from os import path
 import matplotlib.pyplot as plt
 import matplotlib.animation
+import logging
 if path.isdir("src"):
     from src.plotting_functions import plot_setting
     from src.lattice import Lattice
@@ -25,13 +26,24 @@ warnings.filterwarnings("ignore")
 
 # Automatically setting the local path to this repo for easy file writing and saving
 dir_path = path.dirname(path.realpath(__file__))
+# Only keep the warnings printed in the output
+logging.getLogger("requests").setLevel(logging.CRITICAL)
+logging.getLogger("powerlaw").setLevel(logging.CRITICAL)
+
+# Disable printing
+def blockPrint():
+    sys.stdout = open(os.devnull, 'w')
+
+# Restore printing
+def enablePrint():
+    sys.stdout = sys.__stdout__
 
 def comp_average_fitness(size=(20, 20), iteration=2000, repetition=10, std=0.3):
     """
     Plots the average fintess for different distribution and the threshold
     :param : number of iterations, number of repetition and standard deviation for gaussian distribution
-
     """
+    
     # Get a comparison between the different random distribution
     iterations = iteration
     repetition = repetition
@@ -340,3 +352,5 @@ def is_free_variation(i_min=0, i_max=1, i_iter=6):
     plt.tight_layout()
     plt.savefig(path.join(dir_path, 'figures/free_variation_imin={}_imax={}_iterations={}.png'.format(i_min, i_max, i_iter)), dpi=300)
     plt.show()
+
+comp_avalanche_time(size=(20, 20), iteration=2000, repetition=10, std=0.2)
