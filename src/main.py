@@ -42,7 +42,7 @@ def print_statement(alpha,r,p,name):
 
 def comp_average_fitness(size=(20, 20), iteration=2000, repetition=10, std=0.3):
     """
-    Plots the average fintess for different distribution and the threshold
+    Plots the average fitness for different distribution and the threshold
     :param : number of iterations, number of repetition and standard deviation for gaussian distribution
     """
 
