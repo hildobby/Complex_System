@@ -552,7 +552,7 @@ def get_fitness_dist(iterations=20000):
     plt.hist(list(lattice.fitness_dict.values()),label='Fitness Distribution')
     plt.axvline(x=max(lattice.threshold_list['threshold']), color='red',label='Threshold')
     plt.xlim((0, 1))
-    plt.xlabel('Fintess')
+    plt.xlabel('Fitness')
     plt.ylabel('Probability')
     plt.tight_layout()
     plt.legend()
