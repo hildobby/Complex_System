@@ -89,8 +89,8 @@ def comp_average_fitness(size=(20, 20), iteration=2000, repetition=10, std=0.3):
 
     plt.legend()
     plt.title("Average Fitness over the different time step")
-    plt.xlabel("Time steps (a.u.)")
-    plt.ylabel("Fitness (a.u.)")
+    plt.xlabel("Time steps ")
+    plt.ylabel("Fitness ")
     plt.grid()
     plt.tight_layout()
     plt.savefig(path.join(dir_path,
@@ -140,9 +140,9 @@ def comp_avalanche_time(size=(20, 20), iteration=2000, repetition=10, std=0.2):
 
     #plt.plot(average_gaussian,label='Gaussian Distribution')
     plt.legend()
-    plt.title("Avalanche sizes")
-    plt.ylabel("Probability (a.u.)")
-    plt.xlabel("Avalanche sizes (a.u.)")
+    plt.title("Avalanche Time")
+    plt.ylabel("Probability ")
+    plt.xlabel("Avalanche Time")
     plt.grid()
     plt.tight_layout()
     plt.savefig(path.join(dir_path,
@@ -197,8 +197,8 @@ def comp_mutation_dist(size=(20, 20), iteration=2000, repetition=10, std=0.2):
 
     plt.legend()
     plt.title("Distribution of the distances between consecutive mutations")
-    plt.ylabel("Probability (a.u.)")
-    plt.xlabel("Distances between consecutive mutations (a.u.)")
+    plt.ylabel("Probability ")
+    plt.xlabel("Distances between consecutive mutations")
     plt.yscale('log')
     plt.xscale('log')
     plt.grid()
@@ -279,9 +279,9 @@ def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
     powerlaw.plot_pdf(avalanche_vonNeumann_list, color='r', label='von Neumann')
 
     plt.legend()
-    plt.title("Avalanche sizes")
-    plt.ylabel("Probability (a.u.)")
-    plt.xlabel("Avalanche sizes (a.u.)")
+    plt.title("Avalanche Time")
+    plt.ylabel("Probability ")
+    plt.xlabel("Avalanche Time")
     plt.yscale('log')
     plt.xscale('log')
     plt.grid()
@@ -311,8 +311,8 @@ def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
 
     plt.legend()
     plt.title("Distribution of the distances between consecutive mutations")
-    plt.ylabel("Probability (a.u.)")
-    plt.xlabel("Distances between consecutive mutations (a.u.)")
+    plt.ylabel("Probability")
+    plt.xlabel("Distances between consecutive mutations")
     plt.yscale('log')
     plt.xscale('log')
     plt.grid()
@@ -434,8 +434,8 @@ def comp_cluster_sizes(iterations=2000):
 
 
         plt.title("Compare cluster size for different grid sizes")
-        plt.xlabel("Cluster size (a.u.)")
-        plt.ylabel("Probability (a.u.)")
+        plt.xlabel("Cluster size ")
+        plt.ylabel("Probability")
         plt.legend()
         plt.show()
 
@@ -482,8 +482,8 @@ def comp_moving_vs_stationary(size=(20, 20),iteration = 2000,repetition = 10):
 
     plt.legend()
     plt.title("Avalanche sizes")
-    plt.ylabel("Probability (a.u.)")
-    plt.xlabel("Avalanche sizes (a.u.)")
+    plt.ylabel("Probability ")
+    plt.xlabel("Avalanche sizes ")
     plt.grid()
     plt.tight_layout()
     plt.show()
@@ -525,8 +525,8 @@ def comp_diff_dim(iterations = 2000):
     powerlaw.plot_pdf(grid_hist,label='2 Dimensions')
     powerlaw.plot_pdf(cube_hist,label = '3 Dimensions')
     plt.title("Cluster Distribution for 2D and 3D")
-    plt.xlabel("Cluster size (a.u.)")
-    plt.ylabel("Probability (a.u.)")
+    plt.xlabel("Cluster size ")
+    plt.ylabel("Probability ")
     plt.grid()
     plt.legend()
     plt.tight_layout()
@@ -561,4 +561,4 @@ def get_fitness_dist(iterations=20000):
 
 
 
-get_fitness_dist()
+
