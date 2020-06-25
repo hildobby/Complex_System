@@ -440,7 +440,7 @@ def comp_cluster_sizes(iterations=2000):
         plt.show()
 
 
-        print_statement(small_results.power_law.alpha, r_small, p_small, "the20X20 grid's")
+        print_statement(small_results.power_law.alpha, r_small, p_small, "the 20X20 grid's")
         print_statement(medium_results.power_law.alpha, r_medium, p_medium, "the 50X50 grid's")
         print_statement(large_resutls.power_law.alpha, r_large, p_large, "the 70X70 grid's")
 
