@@ -27,6 +27,7 @@ import numpy as np
 from pylab import arange
 from scipy.ndimage import measurements
 import matplotlib.animation as animation
+import seaborn as sns
 
 # Automatically setting the local path to this repo for easy file writing and saving
 dir_path = path.dirname(path.realpath(__file__))
@@ -550,8 +551,6 @@ if __name__ == "__main__":
         plt.tight_layout()
         plt.savefig(path.join(dir_path, 'figures/lattice-age_itr={}.png'.format(iterations)), dpi=300)
         #
-
-        plt.show()
 
 
 

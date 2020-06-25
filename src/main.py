@@ -23,6 +23,7 @@ import numpy as np
 import powerlaw
 import warnings
 import matplotlib.patches as mpatches
+import seaborn as sns
 
 # Automatically setting the local path to this repo for easy file writing and saving
 dir_path = path.dirname(path.realpath(__file__))
@@ -99,6 +100,7 @@ def comp_average_fitness(size=(20, 20), iteration=2000, repetition=10, std=0.3):
                                                                                          std)),
                 dpi=300)
     plt.show()
+
 
 
 def comp_avalanche_time(size=(20, 20), iteration=2000, repetition=10, std=0.2):
@@ -534,4 +536,29 @@ def comp_diff_dim(iterations = 2000):
     print_statement(cube_results.power_law.alpha, r_cube, p_cube, "3D")
 
 
-is_free_variation()
+
+
+def get_fitness_dist(iterations=20000):
+    """
+    Get the distribution of fitness and situate it with respect to the threshold
+    """
+
+    lattice = Lattice(size=(40, 40), torus_mode=True, rand_dist=('uniform',),
+                      free_percent=0, iterations=iterations, age_fraction=1 / 10)
+    lattice.run(["mutation"])
+
+    plot_setting()
+    plt.figure()
+    plt.hist(list(lattice.fitness_dict.values()),label='Fitness Distribution')
+    plt.axvline(x=max(lattice.threshold_list['threshold']), color='red',label='Threshold')
+    plt.xlim((0, 1))
+    plt.xlabel('Fintess')
+    plt.ylabel('Probability')
+    plt.tight_layout()
+    plt.legend()
+
+    plt.show()
+
+
+
+get_fitness_dist()
