@@ -430,6 +430,7 @@ def comp_cluster_sizes(iterations=2000):
         powerlaw.plot_pdf(medium_hist,label = '50X50 Grid')
         powerlaw.plot_pdf(large_hist,label = '70X70 Grid')
 
+
         plt.title("Compare cluster size for different grid sizes")
         plt.xlabel("Cluster size (a.u.)")
         plt.ylabel("Probability (a.u.)")
@@ -511,8 +512,8 @@ def comp_diff_dim(iterations = 2000):
     cube_hist = np.concatenate([cube.cluster_size[x] for x in cube.cluster_size])
 
     # get the power law
-    grid_results = powerlaw.Fit(grid_hist, discrete=True, verbose=False)
-    cube_results = powerlaw.Fit(grid_hist, dicsrete=True, verbose=False)
+    grid_results = powerlaw.Fit(grid_hist, discrete=True,verbose=False)
+    cube_results = powerlaw.Fit(grid_hist, dicsrete=True,verbose=False)
 
     r_grid, p_grid = grid_results.distribution_compare('power_law', 'exponential', normalized_ratio=True)
     r_cube, p_cube = cube_results.distribution_compare('power_law', 'exponential', normalized_ratio=True)
@@ -520,7 +521,15 @@ def comp_diff_dim(iterations = 2000):
     # plot the power law
     plot_setting()
     plt.figure()
+    plt.title("Cluster Distribution for 2D and 3D")
     powerlaw.plot_pdf(grid_hist,label='2 Dimensions')
     powerlaw.plot_pdf(cube_hist,label = '3 Dimensions')
-    plt.tight_layout()
     plt.grid()
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+    print_statement(grid_results.power_law.alpha, r_grid, p_grid, "2D")
+    print_statement(cube_results.power_law.alpha, r_cube, p_cube, "3D")
+
+
