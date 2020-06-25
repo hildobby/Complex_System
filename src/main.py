@@ -511,8 +511,8 @@ def comp_diff_dim(iterations = 2000):
     cube_hist = np.concatenate([cube.cluster_size[x] for x in cube.cluster_size])
 
     # get the power law
-    grid_results = powerlaw.Fit(grid_hist, discrete=True)
-    cube_results = powerlaw.Fit(grid_hist, dicsrete=True)
+    grid_results = powerlaw.Fit(grid_hist, discrete=True, verbose=False)
+    cube_results = powerlaw.Fit(grid_hist, dicsrete=True, verbose=False)
 
     r_grid, p_grid = grid_results.distribution_compare('power_law', 'exponential', normalized_ratio=True)
     r_cube, p_cube = cube_results.distribution_compare('power_law', 'exponential', normalized_ratio=True)
@@ -522,8 +522,5 @@ def comp_diff_dim(iterations = 2000):
     plt.figure()
     powerlaw.plot_pdf(grid_hist,label='2 Dimensions')
     powerlaw.plot_pdf(cube_hist,label = '3 Dimensions')
-
-
-
-
-comp_cluster_sizes()
+    plt.tight_layout()
+    plt.grid()
