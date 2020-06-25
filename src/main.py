@@ -126,9 +126,9 @@ def comp_avalanche_time(size=(20, 20), iteration=2000, repetition=10, std=0.2):
         avalanche_uniform_list = avalanche_uniform_list + uniform.avalanche_time_list['avalanche_time']
         avalanche_gaussian_list = avalanche_gaussian_list + gaussian.avalanche_time_list['avalanche_time']
 
-    result_uniform = powerlaw.Fit(avalanche_uniform_list, discrete=True)
+    result_uniform = powerlaw.Fit(avalanche_uniform_list, discrete=True, verbose=False)
     R_unifrom, p_uniform = result_uniform.distribution_compare('power_law', 'lognormal', normalized_ratio=True)
-    result_gaussian = powerlaw.Fit(avalanche_gaussian_list, discrete=True)
+    result_gaussian = powerlaw.Fit(avalanche_gaussian_list, discrete=True, verbose=False)
     R_gaussian, p_gaussian = result_gaussian.distribution_compare('power_law', 'lognormal', normalized_ratio=True)
 
     # plot for comparision
@@ -414,9 +414,9 @@ def comp_cluster_sizes(iterations=2000):
 
 
         #get the power law
-        small_results = powerlaw.Fit(small_hist, discrete = True)
-        medium_results = powerlaw.Fit(medium_hist,dicsrete = True)
-        large_resutls = powerlaw.Fit(large_hist,discrete = True)
+        small_results = powerlaw.Fit(small_hist, discrete = True, verbose=False)
+        medium_results = powerlaw.Fit(medium_hist,dicsrete = True, verbose=False)
+        large_resutls = powerlaw.Fit(large_hist,discrete = True, verbose=False)
 
         r_small,p_small = small_results.distribution_compare('power_law', 'exponential', normalized_ratio = True)
         r_medium,p_medium = medium_results.distribution_compare('power_law', 'exponential', normalized_ratio = True)
@@ -467,8 +467,3 @@ def comp_moving_vs_stationary(size=(20, 20),iteration = 2000,repetition = 10):
 
         mutation_dist_moore_list =  mutation_dist_moore_list + moore.distance_btw_mutation_list
         mutation_dist_vonNeumann_list = mutation_dist_vonNeumann_list + vonNeumann.distance_btw_mutation_list
-
-
-
-
-comp_cluster_sizes()
