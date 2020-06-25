@@ -32,7 +32,7 @@ warnings.filterwarnings("ignore")
 
 def comp_average_fitness(size=(20, 20), iteration=2000, repetition=10, std=0.3):
     """
-    Plots the average fintess for different distribution and the threshold
+    Plots the average fitness for different distribution and the threshold
     :param : number of iterations, number of repetition and standard deviation for gaussian distribution
     """
 
@@ -117,9 +117,9 @@ def comp_avalanche_time(size=(20, 20), iteration=2000, repetition=10, std=0.2):
         avalanche_uniform_list = avalanche_uniform_list + uniform.avalanche_time_list['avalanche_time']
         avalanche_gaussian_list = avalanche_gaussian_list + gaussian.avalanche_time_list['avalanche_time']
 
-    result_uniform = powerlaw.Fit(avalanche_uniform_list, discrete=True)
+    result_uniform = powerlaw.Fit(avalanche_uniform_list, discrete=True, verbose=False)
     R_unifrom, p_uniform = result_uniform.distribution_compare('power_law', 'lognormal', normalized_ratio=True)
-    result_gaussian = powerlaw.Fit(avalanche_gaussian_list, discrete=True)
+    result_gaussian = powerlaw.Fit(avalanche_gaussian_list, discrete=True, verbose=False)
     R_gaussian, p_gaussian = result_gaussian.distribution_compare('power_law', 'lognormal', normalized_ratio=True)
 
     # plot for comparision
