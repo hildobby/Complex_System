@@ -426,20 +426,20 @@ def comp_cluster_sizes(iterations=2000):
 
         #plot the power law
         plt.figure()
-        powerlaw.plot_pdf(small_hist)
-        powerlaw.plot_pdf(medium_hist)
-        powerlaw.plot_pdf(large_hist)
+        powerlaw.plot_pdf(small_hist,label='20X20 Grid')
+        powerlaw.plot_pdf(medium_hist,label = '50X50 Grid')
+        powerlaw.plot_pdf(large_hist,label = '70X70 Grid')
 
         plt.title("Compare cluster size for different grid sizes")
         plt.xlabel("Cluster size (a.u.)")
         plt.ylabel("Probability (a.u.)")
-
+        plt.legend()
         plt.show()
 
 
-        print_statement(small_results.power_law.alpha, r_small, p_small, "small cluster")
-        print_statement(medium_results.power_law.alpha, r_medium, p_medium, "medium cluster")
-        print_statement(large_resutls.power_law.alpha, r_large, p_large, "large cluster")
+        print_statement(small_results.power_law.alpha, r_small, p_small, "the20X20 grid's")
+        print_statement(medium_results.power_law.alpha, r_medium, p_medium, "the 50X50 grid's")
+        print_statement(large_resutls.power_law.alpha, r_large, p_large, "the 70X70 grid's")
 
 
 def comp_moving_vs_stationary(size=(20, 20),iteration = 2000,repetition = 10):
@@ -451,19 +451,79 @@ def comp_moving_vs_stationary(size=(20, 20),iteration = 2000,repetition = 10):
     iterations = iteration
     repetition = repetition
 
-
+    avalanche_move_list = []
+    avalanche_stationary_list = []
 
     for i in range(repetition):
-        moore = Lattice(size=size, torus_mode=True,neighbourhood='Moore', rand_dist=('uniform',), free_percent=0, iterations=iterations,
+        stationary = Lattice(size=size, torus_mode=True,neighbourhood='Moore', rand_dist=('uniform',), free_percent=0, iterations=iterations,
                         )
-        vonNeumann = Lattice(size=(50,50), torus_mode=True,neighbourhood='vonNeumann', rand_dist=('uniform',), free_percent=0,
+        move = Lattice(size=(50,50), torus_mode=True,neighbourhood='Moore', rand_dist=('uniform',), free_percent=0.3,
                           iterations=iterations,)
 
-        moore.run(["mutation","avalanche_time","get_dist_btw_mutation"])
-        vonNeumann.run(["mutation","avalanche_time","get_dist_btw_mutation"])
+        stationary.run(["mutation","avalanche_time"])
+        move.run(["moving","avalanche_time"])
 
-        avalanche_moore_list = avalanche_moore_list + moore.avalanche_time_list['avalanche_time']
-        avalanche_vonNeumann_list = avalanche_vonNeumann_list + vonNeumann.avalanche_time_list['avalanche_time']
+        avalanche_move_list = avalanche_move_list + move.avalanche_time_list['avalanche_time']
+        avalanche_stationary_list = avalanche_stationary_list + stationary.avalanche_time_list['avalanche_time']
 
-        mutation_dist_moore_list =  mutation_dist_moore_list + moore.distance_btw_mutation_list
-        mutation_dist_vonNeumann_list = mutation_dist_vonNeumann_list + vonNeumann.distance_btw_mutation_list
+    result_move = powerlaw.Fit(avalanche_move_list, discrete=True, verbose=False)
+    R_move, p_move = result_move.distribution_compare('power_law', 'exponential', normalized_ratio=True)
+    result_stationary = powerlaw.Fit(avalanche_stationary_list, discrete=True, verbose=False)
+    R_stationary, p_stationary = result_stationary.distribution_compare(
+        'power_law', 'exponential', normalized_ratio=True)
+
+    # plot for comparision
+    plot_setting()
+    powerlaw.plot_pdf(avalanche_move_list, color='b', label='Migration')
+    powerlaw.plot_pdf(avalanche_stationary_list, color='r', label='No Migration')
+
+    plt.legend()
+    plt.title("Avalanche sizes")
+    plt.ylabel("Probability (a.u.)")
+    plt.xlabel("Avalanche sizes (a.u.)")
+    plt.grid()
+    plt.tight_layout()
+    plt.show()
+
+
+
+    print_statement(result_move.power_law.alpha, R_move, p_move, "migration")
+    print_statement(result_stationary.power_law.alpha, R_stationary, p_stationary, "no migration")
+
+
+
+
+def comp_diff_dim(iterations = 2000):
+    """
+    Compares
+    """
+    # Compares the cluster sizes of different sizes of grid
+
+    grid = Lattice(size=(20, 20), torus_mode=True, rand_dist=('uniform',), free_percent=0, iterations=iterations,
+                    age_fraction=1 / 10)
+    cube = Lattice(size=(20, 20, 3), torus_mode=True, rand_dist=('uniform',), free_percent=0, iterations=iterations,
+                     age_fraction=1 / 10)
+
+    grid.run(["mutation", "update_age", "get_cluster"])
+    cube.run(["mutation", "update_age", "get_cluster"])
+
+    grid_hist = np.concatenate([grid.cluster_size[x] for x in grid.cluster_size])
+    cube_hist = np.concatenate([cube.cluster_size[x] for x in cube.cluster_size])
+
+    # get the power law
+    grid_results = powerlaw.Fit(grid_hist, discrete=True)
+    cube_results = powerlaw.Fit(grid_hist, dicsrete=True)
+
+    r_grid, p_grid = grid_results.distribution_compare('power_law', 'exponential', normalized_ratio=True)
+    r_cube, p_cube = cube_results.distribution_compare('power_law', 'exponential', normalized_ratio=True)
+
+    # plot the power law
+    plot_setting()
+    plt.figure()
+    powerlaw.plot_pdf(grid_hist,label='2 Dimensions')
+    powerlaw.plot_pdf(cube_hist,label = '3 Dimensions')
+
+
+
+
+comp_cluster_sizes()

@@ -491,12 +491,12 @@ class Lattice():
             area = measurements.sum(self.array, lw, index=arange(lw.max() + 1))
             # make sure to not include a zero in the array
             area = area[area != 0]
-            #area_dist_per_itr = area_dist_per_itr + (list(area))
+            area_dist_per_itr = area_dist_per_itr + (list(area))
             # make sure to reset the array
             self.reset_array()
 
         # append it to the collector dict where each key corresponds to the time_step
-            self.cluster_size[self.time_step][group] = area
+        self.cluster_size[self.time_step] = area_dist_per_itr
 
 
 if __name__ == "__main__":
@@ -551,8 +551,12 @@ if __name__ == "__main__":
         plt.savefig(path.join(dir_path, 'figures/lattice-age_itr={}.png'.format(iterations)), dpi=300)
         #
 
-        number_of_frames = 2000
+        plt.show()
 
+
+
+        """
+        number_of_frames = 2000
         def update_hist(num):
             plt.cla()
             plt.hist(np.concatenate([lattice.cluster_size[num][x] for x in lattice.cluster_size[num]]),bins=50)
@@ -563,3 +567,4 @@ if __name__ == "__main__":
 
         animation = animation.FuncAnimation(fig, update_hist, number_of_frames,interval=20)
         plt.show()
+        """
