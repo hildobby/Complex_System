@@ -22,6 +22,8 @@ import time
 import numpy as np
 import powerlaw
 import warnings
+import matplotlib.patches as mpatches
+
 warnings.filterwarnings("ignore")
 
 # Automatically setting the local path to this repo for easy file writing and saving
@@ -332,7 +334,8 @@ def is_free_variation(i_min=0, i_max=1, i_iter=6):
         free_iter.run("all")
         
         av_times = free_iter.avalanche_time_list['avalanche_time']
-        thresholds = free_iter.threshold_list
+        thresholds = free_iter.threshold_list['threshold']
+        thresh_time = free_iter.threshold_list['time_step']
         
         avalanche_bins = range(min(av_times),max(av_times)+1)
         threshold_bins = np.linspace(min(thresholds),max(thresholds),len(thresholds))
@@ -341,16 +344,25 @@ def is_free_variation(i_min=0, i_max=1, i_iter=6):
         #plt.yscale('log')
         #sb.distplot(av_times, label= str(i), hist=True)
         plt.figure(1)
-        plt.hist(av_times, avalanche_bins, label= str(i))
-        plt.legend(loc='upper right')
+        powerlaw.plot_pdf(av_times)
+        #plt.hist(av_times, avalanche_bins, label= str(i))
+        blue = mpatches.Patch(color='b', label='0.0')
+        orange = mpatches.Patch(color='orange', label='0.2')
+        green = mpatches.Patch(color='green', label='0.4')
+        red = mpatches.Patch(color='red', label='0.6')
+        purple = mpatches.Patch(color='purple', label='0.8')
+        plt.legend(handles=[blue,orange,green,red,purple])
         
         plt.figure(2)
-        plt.plot(range(len(thresholds)), thresholds, label= str(i))
+        plt.plot(thresh_time, thresholds, label= str(i))
+        plt.xlabel('Iteration Number')
+        plt.ylabel('Threshold Fitness Level')
         plt.legend(loc='upper right')
-    
+        
+    plt.show()
     plt.grid()
     plt.tight_layout()
     plt.savefig(path.join(dir_path, 'figures/free_variation_imin={}_imax={}_iterations={}.png'.format(i_min, i_max, i_iter)), dpi=300)
     plt.show()
 
-comp_avalanche_time(size=(20, 20), iteration=2000, repetition=10, std=0.2)
+        
