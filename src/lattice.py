@@ -178,7 +178,6 @@ class Lattice():
         self.average_age_list.append(self.average_age)
 
     def get_neighbours(self, chosen_node):
-
         """
         Get the neighbours of the given node and return self.neighbours which is a list of tuples
         """
@@ -235,18 +234,17 @@ class Lattice():
                     self.latest_mutation_pos_list.append(node)
 
         elif self.random_dist == 'gauss':
-            gaussian_random = gauss(self.lattice.nodes[self.min_pos]['fitness'],self.random_dist_specification[1])
+            gaussian_random = gauss(self.lattice.nodes[self.min_pos]['fitness'], self.random_dist_specification[1])
             if gaussian_random >= 0 and gaussian_random <= 1:
                 self.lattice.nodes[self.min_pos]['fitness'] = gaussian_random
             # Mutate the neighbours
             for node in self.neighbours_list:
                 # check if the node has the attribute fitness
                 if node in self.fitness_dict.keys():
-                    gaussian_random = gauss(self.lattice.nodes[node]['fitness'],self.random_dist_specification[1])
-                    if gaussian_random >=0 and gaussian_random <= 1:
+                    gaussian_random = gauss(self.lattice.nodes[node]['fitness'], self.random_dist_specification[1])
+                    if gaussian_random >= 0 and gaussian_random <= 1:
                         self.lattice.nodes[node]['fitness'] = gaussian_random
                     self.latest_mutation_pos_list.append(node)
-
 
     def move(self):
         """
@@ -329,7 +327,7 @@ class Lattice():
         # Save current min_pos to compare to the next new min_pos
         self.old_min_value = deepcopy(self.min_pos)
 
-    def run(self,things_to_collect):
+    def run(self, things_to_collect):
         """
         Run the Bak-Sneppen model using the different rules
         Important to note that the order needs to be in this respective way
@@ -449,11 +447,11 @@ class Lattice():
 
         # make sure that in the beginning the number of groups is min 1
         if cluster_age_range == 0:
-            cluster_age_range =1
+            cluster_age_range = 1
 
         self.lattice.nodes[node]['colour'] = math.ceil(self.lattice.nodes[node]['age'] / cluster_age_range)
 
-    def draw_array(self,group_nr):
+    def draw_array(self, group_nr):
         """
         Redraw the array with the new normalized ages
         """
@@ -490,7 +488,7 @@ class Lattice():
             lw, num = measurements.label(self.array)
             area = measurements.sum(self.array, lw, index=arange(lw.max() + 1))
             # make sure to not include a zero in the array
-            area =area[area != 0]
+            area = area[area != 0]
             #area_dist_per_itr = area_dist_per_itr + (list(area))
             # make sure to reset the array
             self.reset_array()
@@ -498,13 +496,15 @@ class Lattice():
         # append it to the collector dict where each key corresponds to the time_step
             self.cluster_size[self.time_step][group] = area
 
+
 if __name__ == "__main__":
 
     plot = True
     iterations = 20
     t0 = time.time()
     # if rand_dist take 1 arg, rand_dist=('uniform',) !! Comma needed here
-    lattice = Lattice(size=(20, 20), torus_mode=True, rand_dist=('uniform',), free_percent=0, iterations=iterations,age_fraction=1/10)
+    lattice = Lattice(size=(20, 20), torus_mode=True, rand_dist=('uniform',),
+                      free_percent=0, iterations=iterations, age_fraction=1 / 10)
     print(nx.info(lattice.lattice, n=None))
     lattice.run(["all"])
     t1 = time.time()
@@ -544,7 +544,6 @@ if __name__ == "__main__":
         age = lattice.plot(label='age')
         plt.colorbar(age)
         #
-
 
         """
         number_of_frames = 2000
