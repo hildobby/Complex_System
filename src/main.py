@@ -30,9 +30,18 @@ dir_path = path.dirname(path.realpath(__file__))
 warnings.filterwarnings("ignore")
 
 
+def print_statement(alpha,r,p,name):
+
+    print("The slope of {} disrtibution is {}".format(name,alpha))
+    if r < 0:
+        print("{} follows a lognormal distribution with a p = {} ".format(name,p))
+    if r > 0:
+        print("{} follows a powerlaw distribution with a p = {} ".format(name, p))
+
+
 def comp_average_fitness(size=(20, 20), iteration=2000, repetition=10, std=0.3):
     """
-    Plots the average fitness for different distribution and the threshold
+    Plots the average fintess for different distribution and the threshold
     :param : number of iterations, number of repetition and standard deviation for gaussian distribution
     """
 
@@ -117,9 +126,9 @@ def comp_avalanche_time(size=(20, 20), iteration=2000, repetition=10, std=0.2):
         avalanche_uniform_list = avalanche_uniform_list + uniform.avalanche_time_list['avalanche_time']
         avalanche_gaussian_list = avalanche_gaussian_list + gaussian.avalanche_time_list['avalanche_time']
 
-    result_uniform = powerlaw.Fit(avalanche_uniform_list, discrete=True, verbose=False)
+    result_uniform = powerlaw.Fit(avalanche_uniform_list, discrete=True)
     R_unifrom, p_uniform = result_uniform.distribution_compare('power_law', 'lognormal', normalized_ratio=True)
-    result_gaussian = powerlaw.Fit(avalanche_gaussian_list, discrete=True, verbose=False)
+    result_gaussian = powerlaw.Fit(avalanche_gaussian_list, discrete=True)
     R_gaussian, p_gaussian = result_gaussian.distribution_compare('power_law', 'lognormal', normalized_ratio=True)
 
     # plot for comparision
@@ -130,8 +139,8 @@ def comp_avalanche_time(size=(20, 20), iteration=2000, repetition=10, std=0.2):
     #plt.plot(average_gaussian,label='Gaussian Distribution')
     plt.legend()
     plt.title("Avalanche sizes")
-    plt.xlabel("Probability (a.u.)")
-    plt.ylabel("Avalanche sizes (a.u.)")
+    plt.ylabel("Probability (a.u.)")
+    plt.xlabel("Avalanche sizes (a.u.)")
     plt.grid()
     plt.tight_layout()
     plt.savefig(path.join(dir_path,
@@ -142,18 +151,9 @@ def comp_avalanche_time(size=(20, 20), iteration=2000, repetition=10, std=0.2):
                 dpi=300)
     plt.show()
 
-    print("The slope with a uniform distribution is {}".format(result_uniform.power_law.alpha))
-    print(
-        "If {} > 0, the distribution of the data with uniform distribution resembles more a powerlaw than exponential distribution \n"
-        "with a p value of {}".format(
-            R_unifrom,
-            p_uniform))
-    print("The slope with a Gaussian distribtion is {}".format(result_gaussian.power_law.alpha))
-    print(
-        "If {} > 0, the distribution of the data with a gaussian distribution resembles more a powerlaw than exponential distribution \n"
-        "with a p value of {}".format(
-            R_gaussian,
-            p_gaussian))
+    print_statement(result_uniform.power_law.alpha,  R_unifrom,p_uniform, "uniform")
+    print_statement(result_gaussian.power_law.alpha, R_gaussian, p_gaussian, "gaussian")
+
 
 
 def comp_mutation_dist(size=(20, 20), iteration=2000, repetition=10, std=0.2):
@@ -195,8 +195,8 @@ def comp_mutation_dist(size=(20, 20), iteration=2000, repetition=10, std=0.2):
 
     plt.legend()
     plt.title("Distribution of the distances between consecutive mutations")
-    plt.xlabel("Probability (a.u.)")
-    plt.ylabel("Distances between consecutive mutations (a.u.)")
+    plt.ylabel("Probability (a.u.)")
+    plt.xlabel("Distances between consecutive mutations (a.u.)")
     plt.yscale('log')
     plt.xscale('log')
     plt.grid()
@@ -209,18 +209,9 @@ def comp_mutation_dist(size=(20, 20), iteration=2000, repetition=10, std=0.2):
                 dpi=300)
     plt.show()
 
-    print("The slope with a uniform distribution is {}".format(result_uniform.power_law.alpha))
-    print(
-        "If {} > 0, the distribution of the data with uniform distribution resembles more a powerlaw than exponential distribution \n"
-        "with a p value of {}".format(
-            R_unifrom,
-            p_uniform))
-    print("The slope with a Gaussian distribtion is {}".format(result_gaussian.power_law.alpha))
-    print(
-        "If {} > 0, the distribution of the data with a gaussian distribution resembles more a powerlaw than exponential distribution \n"
-        "with a p value of {}".format(
-            R_gaussian,
-            p_gaussian))
+    print_statement(result_uniform.power_law.alpha,  R_unifrom,p_uniform, "uniform")
+    print_statement(result_gaussian.power_law.alpha, R_gaussian, p_gaussian, "gaussian")
+
 
 
 def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
@@ -260,6 +251,10 @@ def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
             free_percent=0,
             iterations=iterations,
         )
+        moore = Lattice(size=size, torus_mode=True,neighbourhood='Moore', rand_dist=('uniform',), free_percent=0, iterations=iterations,
+                        )
+        vonNeumann = Lattice(size=(50,50), torus_mode=True,neighbourhood='vonNeumann', rand_dist=('uniform',), free_percent=0,
+                          iterations=iterations,)
 
         moore.run(["mutation", "avalanche_time", "get_dist_btw_mutation"])
         vonNeumann.run(["mutation", "avalanche_time", "get_dist_btw_mutation"])
@@ -283,8 +278,8 @@ def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
 
     plt.legend()
     plt.title("Avalanche sizes")
-    plt.xlabel("Probability (a.u.)")
-    plt.ylabel("Avalanche sizes (a.u.)")
+    plt.ylabel("Probability (a.u.)")
+    plt.xlabel("Avalanche sizes (a.u.)")
     plt.yscale('log')
     plt.xscale('log')
     plt.grid()
@@ -298,18 +293,11 @@ def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
     result_vonNeumann = powerlaw.Fit(mutation_dist_vonNeumann_list, discrete=True, verbose=False)
     R_vonNeumann, p_vonNeumann = result_vonNeumann.distribution_compare(
         'power_law', 'exponential', normalized_ratio=True)
-    print("The slope with a unifrom distribtion is {}".format(result_moore.power_law.alpha))
-    print(
-        "If {} > 0, the distribution of the data with Moore neighbourhood resembles more a powerlaw than exponential distribution \n"
-        "with a p value of {}".format(
-            R_moore,
-            p_moore))
-    print("The slope with a Gaussian distribtion is {}".format(result_vonNeumann.power_law.alpha))
-    print(
-        "If {} > 0, the distribution of the data with Moore neighbourhood resembles more a powerlaw than exponential distribution \n"
-        "with a p value of {}".format(
-            R_vonNeumann,
-            p_vonNeumann))
+
+
+    print_statement(result_moore.power_law.alpha,  R_moore,p_moore, "More Neighbour")
+    print_statement(result_vonNeumann.power_law.alpha, R_vonNeumann,p_vonNeumann, "vonNeumann Neighbourhood")
+
 
     n_moore, bins_moore = np.histogram(mutation_dist_moore_list, density=True)
     n_vonNeumann, bins_vonNeumann = np.histogram(mutation_dist_vonNeumann_list, density=True)
@@ -321,8 +309,8 @@ def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
 
     plt.legend()
     plt.title("Distribution of the distances between consecutive mutations")
-    plt.xlabel("Probability (a.u.)")
-    plt.ylabel("Distances between consecutive mutations (a.u.)")
+    plt.ylabel("Probability (a.u.)")
+    plt.xlabel("Distances between consecutive mutations (a.u.)")
     plt.yscale('log')
     plt.xscale('log')
     plt.grid()
@@ -330,21 +318,10 @@ def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
     plt.savefig(path.join(dir_path, 'figures/diff_neighbours_s={}_itr={}_rep={}.png'.format(size, iteration, repetition)), dpi=300)
     plt.show()
 
-    print("The slope with a unifrom distribtion is {}".format(result_moore.power_law.alpha))
-    print(
-        "If {} > 0, the distribution of the data with Moore neighbourhood resembles more a powerlaw than exponential distribution \n"
-        "with a p value of {}".format(
-            R_moore,
-            p_moore))
-    print("The slope with a Gaussian distribtion is {}".format(result_vonNeumann.power_law.alpha))
-    print(
-        "If {} > 0, the distribution of the data with Moore neighbourhood resembles more a powerlaw than exponential distribution \n"
-        "with a p value of {}".format(
-            R_vonNeumann,
-            p_vonNeumann))
+    print_statement(result_moore.power_law.alpha,  R_moore,p_moore, "More Neighbour")
+    print_statement(result_vonNeumann.power_law.alpha, R_vonNeumann,p_vonNeumann, "vonNeumann")
 
-
-def is_free_variation(i_min=0, i_max=1, i_iter=6, iterations = 2000):
+def is_free_variation(i_min=0, i_max=1, i_iter=6):
     '''
     runs several instances of the lattice
     with different percentages of empty nodes in the lattice.
@@ -410,3 +387,88 @@ def is_free_variation(i_min=0, i_max=1, i_iter=6, iterations = 2000):
     plt.tight_layout()
     plt.savefig(path.join(dir_path, 'figures/free_variation_imin={}_imax={}_iterations={}.png'.format(i_min, i_max, i_iter)), dpi=300)
     plt.show()
+
+
+def comp_cluster_sizes(iterations=2000):
+    # Compares the cluster sizes of different sizes of grid
+
+
+
+
+        small= Lattice(size=(20,20), torus_mode=True, rand_dist=('uniform',), free_percent=0, iterations=iterations,
+                          age_fraction=1 / 10)
+        medium = Lattice(size=(50,50), torus_mode=True, rand_dist=('uniform',), free_percent=0, iterations=iterations,
+                          age_fraction=1 / 10)
+
+        large = Lattice(size=(70,70), torus_mode=True, rand_dist=('uniform',), free_percent=0, iterations=iterations,
+                          age_fraction=1 / 10)
+
+        small.run(["mutation", "update_age","get_cluster"])
+        medium.run(["mutation","update_age","get_cluster"])
+        large.run(["mutation","update_age","get_cluster"])
+
+
+        small_hist = np.concatenate([small.cluster_size[x] for x in small.cluster_size])
+        medium_hist = np.concatenate([medium.cluster_size[x] for x in medium.cluster_size])
+        large_hist = np.concatenate([large.cluster_size[x] for x in large.cluster_size])
+
+
+        #get the power law
+        small_results = powerlaw.Fit(small_hist, discrete = True)
+        medium_results = powerlaw.Fit(medium_hist,dicsrete = True)
+        large_resutls = powerlaw.Fit(large_hist,discrete = True)
+
+        r_small,p_small = small_results.distribution_compare('power_law', 'exponential', normalized_ratio = True)
+        r_medium,p_medium = medium_results.distribution_compare('power_law', 'exponential', normalized_ratio = True)
+        r_large,p_large = large_resutls.distribution_compare('power_law', 'exponential', normalized_ratio = True)
+
+
+
+        #plot the power law
+        plt.figure()
+        powerlaw.plot_pdf(small_hist)
+        powerlaw.plot_pdf(medium_hist)
+        powerlaw.plot_pdf(large_hist)
+
+        plt.title("Compare cluster size for different grid sizes")
+        plt.xlabel("Cluster size (a.u.)")
+        plt.ylabel("Probability (a.u.)")
+
+        plt.show()
+
+
+        print_statement(small_results.power_law.alpha, r_small, p_small, "small cluster")
+        print_statement(medium_results.power_law.alpha, r_medium, p_medium, "medium cluster")
+        print_statement(large_resutls.power_law.alpha, r_large, p_large, "large cluster")
+
+
+def comp_moving_vs_stationary(size=(20, 20),iteration = 2000,repetition = 10):
+    """
+    Compares the cluster sizes  and avalanche time
+
+    """
+    # Get a comparison between the different random distribution
+    iterations = iteration
+    repetition = repetition
+
+
+
+    for i in range(repetition):
+        moore = Lattice(size=size, torus_mode=True,neighbourhood='Moore', rand_dist=('uniform',), free_percent=0, iterations=iterations,
+                        )
+        vonNeumann = Lattice(size=(50,50), torus_mode=True,neighbourhood='vonNeumann', rand_dist=('uniform',), free_percent=0,
+                          iterations=iterations,)
+
+        moore.run(["mutation","avalanche_time","get_dist_btw_mutation"])
+        vonNeumann.run(["mutation","avalanche_time","get_dist_btw_mutation"])
+
+        avalanche_moore_list = avalanche_moore_list + moore.avalanche_time_list['avalanche_time']
+        avalanche_vonNeumann_list = avalanche_vonNeumann_list + vonNeumann.avalanche_time_list['avalanche_time']
+
+        mutation_dist_moore_list =  mutation_dist_moore_list + moore.distance_btw_mutation_list
+        mutation_dist_vonNeumann_list = mutation_dist_vonNeumann_list + vonNeumann.distance_btw_mutation_list
+
+
+
+
+comp_cluster_sizes()
