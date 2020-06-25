@@ -142,18 +142,18 @@ def comp_avalanche_time(size=(20, 20), iteration=2000, repetition=10, std=0.2):
                 dpi=300)
     plt.show()
 
-    print("The slope with a uniform distribution is {}".format(result_uniform.power_law.alpha))
+    print("The slope with a uniform distribution is {}".format(round(result_uniform.power_law.alpha,4)))
     print(
         "If {} > 0, the distribution of the data with uniform distribution resembles more a powerlaw than exponential distribution \n"
         "with a p value of {}".format(
-            R_unifrom,
-            p_uniform))
-    print("The slope with a Gaussian distribtion is {}".format(result_gaussian.power_law.alpha))
+            round(R_unifrom,4),
+            round(p_uniform,4)))
+    print("The slope with a Gaussian distribtion is {}".format(round(result_gaussian.power_law.alpha, 4))
     print(
         "If {} > 0, the distribution of the data with a gaussian distribution resembles more a powerlaw than exponential distribution \n"
         "with a p value of {}".format(
-            R_gaussian,
-            p_gaussian))
+            round(R_gaussian,4),
+            round(p_gaussian,4)))
 
 
 def comp_mutation_dist(size=(20, 20), iteration=2000, repetition=10, std=0.2):
@@ -209,18 +209,18 @@ def comp_mutation_dist(size=(20, 20), iteration=2000, repetition=10, std=0.2):
                 dpi=300)
     plt.show()
 
-    print("The slope with a uniform distribution is {}".format(result_uniform.power_law.alpha))
+    print("The slope with a uniform distribution is {}".format(round(result_uniform.power_law.alpha,4)))
     print(
         "If {} > 0, the distribution of the data with uniform distribution resembles more a powerlaw than exponential distribution \n"
         "with a p value of {}".format(
-            R_unifrom,
-            p_uniform))
-    print("The slope with a Gaussian distribtion is {}".format(result_gaussian.power_law.alpha))
+            round(R_unifrom,4),
+            round(p_uniform,4)))
+    print("The slope with a Gaussian distribtion is {}".format(round(result_gaussian.power_law.alpha,4)))
     print(
         "If {} > 0, the distribution of the data with a gaussian distribution resembles more a powerlaw than exponential distribution \n"
         "with a p value of {}".format(
-            R_gaussian,
-            p_gaussian))
+            round(R_gaussian,4),
+            round(p_gaussian,4)))
 
 
 def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
@@ -298,18 +298,18 @@ def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
     result_vonNeumann = powerlaw.Fit(mutation_dist_vonNeumann_list, discrete=True, verbose=False)
     R_vonNeumann, p_vonNeumann = result_vonNeumann.distribution_compare(
         'power_law', 'exponential', normalized_ratio=True)
-    print("The slope with a unifrom distribtion is {}".format(result_moore.power_law.alpha))
+    print("The slope with a unifrom distribtion is {}".format(round(result_moore.power_law.alpha,4)))
     print(
         "If {} > 0, the distribution of the data with Moore neighbourhood resembles more a powerlaw than exponential distribution \n"
         "with a p value of {}".format(
-            R_moore,
-            p_moore))
+            round(R_moore,4),
+            round(p_moore,4)))
     print("The slope with a Gaussian distribtion is {}".format(result_vonNeumann.power_law.alpha))
     print(
         "If {} > 0, the distribution of the data with Moore neighbourhood resembles more a powerlaw than exponential distribution \n"
         "with a p value of {}".format(
-            R_vonNeumann,
-            p_vonNeumann))
+            round(R_vonNeumann,4),
+            round(p_vonNeumann,4)))
 
     n_moore, bins_moore = np.histogram(mutation_dist_moore_list, density=True)
     n_vonNeumann, bins_vonNeumann = np.histogram(mutation_dist_vonNeumann_list, density=True)
@@ -334,14 +334,14 @@ def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
     print(
         "If {} > 0, the distribution of the data with Moore neighbourhood resembles more a powerlaw than exponential distribution \n"
         "with a p value of {}".format(
-            R_moore,
-            p_moore))
+            round(R_moore,4),
+            round(p_moore,4)))
     print("The slope with a Gaussian distribtion is {}".format(result_vonNeumann.power_law.alpha))
     print(
         "If {} > 0, the distribution of the data with Moore neighbourhood resembles more a powerlaw than exponential distribution \n"
         "with a p value of {}".format(
-            R_vonNeumann,
-            p_vonNeumann))
+            round(R_vonNeumann,4),
+            round(p_vonNeumann,4)))
 
 
 def is_free_variation(i_min=0, i_max=1, i_iter=6, iterations = 2000):

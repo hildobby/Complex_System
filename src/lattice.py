@@ -28,6 +28,8 @@ from pylab import arange
 from scipy.ndimage import measurements
 import matplotlib.animation as animation
 
+# Automatically setting the local path to this repo for easy file writing and saving
+dir_path = path.dirname(path.realpath(__file__))
 
 class Lattice():
     def __init__(self, size=(10, 10),
@@ -500,7 +502,7 @@ class Lattice():
 if __name__ == "__main__":
 
     plot = True
-    iterations = 20
+    iterations = 2000
     t0 = time.time()
     # if rand_dist take 1 arg, rand_dist=('uniform',) !! Comma needed here
     lattice = Lattice(size=(20, 20), torus_mode=True, rand_dist=('uniform',),
@@ -535,17 +537,20 @@ if __name__ == "__main__":
         ax3.set_xscale('log')
 
         plt.figure()
-        plt.title('Fitness Distribution')
+        plt.title('Random original fitness distribution on a 2D lattice')
         fitness = lattice.plot(label='fitness')
         plt.colorbar(fitness)
-        #
+        plt.tight_layout()
+        plt.savefig(path.join(dir_path, 'figures/lattice_itr=1.png'), dpi=300)
+        
         plt.figure()
-        plt.title('Age Distribution after {} itr'.format(iterations))
+        plt.title('Age Distribution after {} iterations'.format(iterations))
         age = lattice.plot(label='age')
         plt.colorbar(age)
+        plt.tight_layout()
+        plt.savefig(path.join(dir_path, 'figures/lattice-age_itr={}.png'.format(iterations)), dpi=300)
         #
 
-        """
         number_of_frames = 2000
 
         def update_hist(num):
@@ -558,4 +563,3 @@ if __name__ == "__main__":
 
         animation = animation.FuncAnimation(fig, update_hist, number_of_frames,interval=20)
         plt.show()
-        """
