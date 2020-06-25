@@ -23,6 +23,7 @@ import numpy as np
 import powerlaw
 import warnings
 import matplotlib.patches as mpatches
+import seaborn as sns
 
 # Automatically setting the local path to this repo for easy file writing and saving
 dir_path = path.dirname(path.realpath(__file__))
@@ -88,8 +89,8 @@ def comp_average_fitness(size=(20, 20), iteration=2000, repetition=10, std=0.3):
 
     plt.legend()
     plt.title("Average Fitness over the different time step")
-    plt.xlabel("Time steps (a.u.)")
-    plt.ylabel("Fitness (a.u.)")
+    plt.xlabel("Time steps ")
+    plt.ylabel("Fitness ")
     plt.grid()
     plt.tight_layout()
     plt.savefig(path.join(dir_path,
@@ -99,6 +100,7 @@ def comp_average_fitness(size=(20, 20), iteration=2000, repetition=10, std=0.3):
                                                                                          std)),
                 dpi=300)
     plt.show()
+
 
 
 def comp_avalanche_time(size=(20, 20), iteration=2000, repetition=10, std=0.2):
@@ -138,9 +140,9 @@ def comp_avalanche_time(size=(20, 20), iteration=2000, repetition=10, std=0.2):
 
     #plt.plot(average_gaussian,label='Gaussian Distribution')
     plt.legend()
-    plt.title("Avalanche sizes")
-    plt.ylabel("Probability (a.u.)")
-    plt.xlabel("Avalanche sizes (a.u.)")
+    plt.title("Avalanche Time")
+    plt.ylabel("Probability ")
+    plt.xlabel("Avalanche Time")
     plt.grid()
     plt.tight_layout()
     plt.savefig(path.join(dir_path,
@@ -195,8 +197,8 @@ def comp_mutation_dist(size=(20, 20), iteration=2000, repetition=10, std=0.2):
 
     plt.legend()
     plt.title("Distribution of the distances between consecutive mutations")
-    plt.ylabel("Probability (a.u.)")
-    plt.xlabel("Distances between consecutive mutations (a.u.)")
+    plt.ylabel("Probability ")
+    plt.xlabel("Distances between consecutive mutations")
     plt.yscale('log')
     plt.xscale('log')
     plt.grid()
@@ -244,7 +246,7 @@ def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
         vonNeumann = Lattice(
             size=size,
             torus_mode=True,
-            neighbourhood='vonNeumann',
+            neighbourhood='von Neumann',
             rand_dist=(
                 'uniform',
             ),
@@ -253,7 +255,7 @@ def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
         )
         moore = Lattice(size=size, torus_mode=True,neighbourhood='Moore', rand_dist=('uniform',), free_percent=0, iterations=iterations,
                         )
-        vonNeumann = Lattice(size=(50,50), torus_mode=True,neighbourhood='vonNeumann', rand_dist=('uniform',), free_percent=0,
+        vonNeumann = Lattice(size=(50,50), torus_mode=True,neighbourhood='von Neumann', rand_dist=('uniform',), free_percent=0,
                           iterations=iterations,)
 
         moore.run(["mutation", "avalanche_time", "get_dist_btw_mutation"])
@@ -274,12 +276,12 @@ def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
     # plot for comparision
     plot_setting()
     powerlaw.plot_pdf(avalanche_moore_list, color='b', label='Moore')
-    powerlaw.plot_pdf(avalanche_vonNeumann_list, color='r', label='vonNeuman')
+    powerlaw.plot_pdf(avalanche_vonNeumann_list, color='r', label='von Neumann')
 
     plt.legend()
-    plt.title("Avalanche sizes")
-    plt.ylabel("Probability (a.u.)")
-    plt.xlabel("Avalanche sizes (a.u.)")
+    plt.title("Avalanche Time")
+    plt.ylabel("Probability ")
+    plt.xlabel("Avalanche Time")
     plt.yscale('log')
     plt.xscale('log')
     plt.grid()
@@ -296,7 +298,7 @@ def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
 
 
     print_statement(result_moore.power_law.alpha,  R_moore,p_moore, "More Neighbour")
-    print_statement(result_vonNeumann.power_law.alpha, R_vonNeumann,p_vonNeumann, "vonNeumann Neighbourhood")
+    print_statement(result_vonNeumann.power_law.alpha, R_vonNeumann,p_vonNeumann, "von Neumann Neighbourhood")
 
 
     n_moore, bins_moore = np.histogram(mutation_dist_moore_list, density=True)
@@ -305,12 +307,12 @@ def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
     # plot for comparision
     plot_setting()
     plt.plot(bins_moore[:-1], n_moore, label='Moore Neighbourhood')
-    plt.plot(bins_vonNeumann[:-1], n_vonNeumann, label='vonNeumann Neighbourhood')
+    plt.plot(bins_vonNeumann[:-1], n_vonNeumann, label='von Neumann Neighbourhood')
 
     plt.legend()
     plt.title("Distribution of the distances between consecutive mutations")
-    plt.ylabel("Probability (a.u.)")
-    plt.xlabel("Distances between consecutive mutations (a.u.)")
+    plt.ylabel("Probability")
+    plt.xlabel("Distances between consecutive mutations")
     plt.yscale('log')
     plt.xscale('log')
     plt.grid()
@@ -319,7 +321,7 @@ def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
     plt.show()
 
     print_statement(result_moore.power_law.alpha,  R_moore,p_moore, "More Neighbour")
-    print_statement(result_vonNeumann.power_law.alpha, R_vonNeumann,p_vonNeumann, "vonNeumann")
+    print_statement(result_vonNeumann.power_law.alpha, R_vonNeumann,p_vonNeumann, 'von Neumann')
 
 def is_free_variation(i_min=0, i_max=1, i_iter=6, iterations=2000):
     '''
@@ -432,13 +434,13 @@ def comp_cluster_sizes(iterations=2000):
 
 
         plt.title("Compare cluster size for different grid sizes")
-        plt.xlabel("Cluster size (a.u.)")
-        plt.ylabel("Probability (a.u.)")
+        plt.xlabel("Cluster size ")
+        plt.ylabel("Probability")
         plt.legend()
         plt.show()
 
 
-        print_statement(small_results.power_law.alpha, r_small, p_small, "the20X20 grid's")
+        print_statement(small_results.power_law.alpha, r_small, p_small, "the 20X20 grid's")
         print_statement(medium_results.power_law.alpha, r_medium, p_medium, "the 50X50 grid's")
         print_statement(large_resutls.power_law.alpha, r_large, p_large, "the 70X70 grid's")
 
@@ -480,8 +482,8 @@ def comp_moving_vs_stationary(size=(20, 20),iteration = 2000,repetition = 10):
 
     plt.legend()
     plt.title("Avalanche sizes")
-    plt.ylabel("Probability (a.u.)")
-    plt.xlabel("Avalanche sizes (a.u.)")
+    plt.ylabel("Probability ")
+    plt.xlabel("Avalanche sizes ")
     plt.grid()
     plt.tight_layout()
     plt.show()
@@ -520,10 +522,11 @@ def comp_diff_dim(iterations = 2000):
 
     # plot the power law
     plot_setting()
-    plt.figure()
-    plt.title("Cluster Distribution for 2D and 3D")
     powerlaw.plot_pdf(grid_hist,label='2 Dimensions')
     powerlaw.plot_pdf(cube_hist,label = '3 Dimensions')
+    plt.title("Cluster Distribution for 2D and 3D")
+    plt.xlabel("Cluster size ")
+    plt.ylabel("Probability ")
     plt.grid()
     plt.legend()
     plt.tight_layout()
@@ -531,5 +534,31 @@ def comp_diff_dim(iterations = 2000):
 
     print_statement(grid_results.power_law.alpha, r_grid, p_grid, "2D")
     print_statement(cube_results.power_law.alpha, r_cube, p_cube, "3D")
+
+
+
+
+def get_fitness_dist(iterations=20000):
+    """
+    Get the distribution of fitness and situate it with respect to the threshold
+    """
+
+    lattice = Lattice(size=(40, 40), torus_mode=True, rand_dist=('uniform',),
+                      free_percent=0, iterations=iterations, age_fraction=1 / 10)
+    lattice.run(["mutation"])
+
+    plot_setting()
+    plt.figure()
+    plt.hist(list(lattice.fitness_dict.values()),label='Fitness Distribution')
+    plt.axvline(x=max(lattice.threshold_list['threshold']), color='red',label='Threshold')
+    plt.xlim((0, 1))
+    plt.xlabel('Fintess')
+    plt.ylabel('Probability')
+    plt.tight_layout()
+    plt.legend()
+
+    plt.show()
+
+
 
 
