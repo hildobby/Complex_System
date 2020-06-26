@@ -1,8 +1,10 @@
-# Complex System Simulation: Expanding and exploring the Bak-Snappen model
-
-2 Dimensions Bak-Snappen model, evaluation of the resulting model behaviour and effect of various parameters.
+# Expanding and exploring the Bak-Snappen model written in Python 3+
+=========================================
+2 dimensions and 3 dimensions Bak-Snappen model, evaluation of the resulting model behaviour and effect of various parameters.
 
 By: [Hildebert Moulié](https://github.com/hildobby), [Philippe Nicolau](https://github.com/PNicolau96), [Louis Weyland](https://github.com/LouisWW) & [Binjie Zhou](https://github.com/binjiezhou).
+
+![Initial state of the lattice fitnessses](https://github.com/hildobby/Complex_System/src/figures/lattice_itr=1.png) ![Age of the nodes on the lattice after 2000 iterations](https://github.com/hildobby/Complex_System/src/figures/lattice-age_itr=2000.png)
 
 ## Setup required packages
 
@@ -35,7 +37,8 @@ An overview of the results can also be found in [the Jupyter notebook file](http
 
 
 
-## An overview of some of the results
+## Overview of some of the results
+
 
 
 
