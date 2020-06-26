@@ -6,8 +6,8 @@ Expanding and exploring the Bak-Sneppen model written in Python 3+
 By: [Hildebert Moulié](https://github.com/hildobby), [Philippe Nicolau](https://github.com/PNicolau96), [Louis Weyland](https://github.com/LouisWW) & [Binjie Zhou](https://github.com/binjiezhou).
 
 <p float="left" class="center">
-  <img src="https://github.com/hildobby/Complex_System/blob/master/src/figures/lattice_itr%3D1.png" width="350" />
-  <img src="https://github.com/hildobby/Complex_System/blob/master/src/figures/lattice-age_itr%3D2000.png" width="350" /> 
+  <img src="https://github.com/hildobby/Complex_System/blob/master/src/figures/lattice_itr%3D1.png" width="400" />
+  <img src="https://github.com/hildobby/Complex_System/blob/master/src/figures/lattice-age_itr%3D2000.png" width="400" /> 
 </p>
 
 ## Project Plan
