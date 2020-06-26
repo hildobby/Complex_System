@@ -1,4 +1,4 @@
-# Expanding and exploring the Bak-Snappen model written in Python 3+
+# Expanding and exploring the Bak-Sneppen model written in Python 3+
 =========================================
 2 dimensions and 3 dimensions Bak-Snappen model, evaluation of the resulting model behaviour and effect of various parameters.
 
