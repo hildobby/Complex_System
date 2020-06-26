@@ -40,16 +40,9 @@ An overview of the results can also be found in [the Jupyter notebook file](http
 
 
 
-
-## Useful resources:
-
-* [Concise explanation of a simple 1 dimension Bak-Sneppen model](http://csmgeo.csm.jmu.edu/geollab/fichter/gs102/2004handouts/Bak-Sneppenbrief.PDF)
-* [Repo with a 2 dimensions Bak-Sneppen model for inspiration](https://github.com/voschezang/Spatial-Bak-Sneppen)
-
-
-
 ## References
 
 * Bak, P., & Sneppen, K. (1993). Punctuated equilibrium and criticality in a simple model of evolution. Physical review letters, 71(24), 4083.
 * Fraiman, D. (2018). Bak-Sneppen model: Local equilibrium and critical value. Physical Review E, 97(4), 042123.
 * Paczuski, M., Maslov, S., & Bak, P. (1996). Avalanche dynamics in evolution, growth, and depinning models. Physical Review E, 53(1), 414.
+* Alstott, J., Bullmore, E., & Plenz, D. (2014). powerlaw: a Python package for analysis of heavy-tailed distributions. PloS one, 9(1), e85777.
