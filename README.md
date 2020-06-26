@@ -28,10 +28,10 @@ An overview of the results can also be found in [the Jupyter notebook file](http
 1. Bring the 1 dimension Bak-Snappen model to 2 dimensions and 3 dimensions
 2. Evaluate different results from the model:
     * Avalanche time and compare it between several models
-    * Mutation distance (Check if power still applies here)
+    * Mutation distance (Check if power law still applies here)
     * Cluster sizes
     * Evolutionary time
-3. Test the data withe the [powerlaw](https://pypi.org/project/powerlaw/) package
+3. Test the data with the [powerlaw](https://pypi.org/project/powerlaw/) package
 
 
 
