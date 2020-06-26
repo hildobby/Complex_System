@@ -10,8 +10,6 @@ By: [Hildebert Moulié](https://github.com/hildobby), [Philippe Nicolau](https:/
   <img src="https://github.com/hildobby/Complex_System/blob/master/src/figures/lattice-age_itr%3D2000.png" width="500" /> 
 </p>
 
-![Initial state of the lattice fitnessses](https://github.com/hildobby/Complex_System/blob/master/src/figures/lattice_itr%3D1.png) ![Age of the nodes on the lattice after 2000 iterations](https://github.com/hildobby/Complex_System/blob/master/src/figures/lattice-age_itr%3D2000.png)
-
 ## Setup required packages
 
 Gathering the required packages
