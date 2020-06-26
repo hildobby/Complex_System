@@ -34,7 +34,6 @@ An overview of the results can also be found in [the Jupyter notebook file](http
 3. Test the data withe the [powerlaw](https://pypi.org/project/powerlaw/) package
 
 
-[Here](https://docs.google.com/document/d/1rTodhozVX6pXBGTlviCNNwwcX3oG-x80GXP4DIutzHM/edit?usp=sharing) you will find the link to the Google Document of original project plan.
 
 ## An overview of some of the results
 
