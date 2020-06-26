@@ -1,10 +1,11 @@
-# Expanding and exploring the Bak-Sneppen model written in Python 3+
+Expanding and exploring the Bak-Sneppen model written in Python 3+
 =========================================
+
 2 dimensions and 3 dimensions Bak-Snappen model, evaluation of the resulting model behaviour and effect of various parameters.
 
 By: [Hildebert Moulié](https://github.com/hildobby), [Philippe Nicolau](https://github.com/PNicolau96), [Louis Weyland](https://github.com/LouisWW) & [Binjie Zhou](https://github.com/binjiezhou).
 
-![Initial state of the lattice fitnessses](https://github.com/hildobby/Complex_System/src/figures/lattice_itr=1.png) ![Age of the nodes on the lattice after 2000 iterations](https://github.com/hildobby/Complex_System/src/figures/lattice-age_itr=2000.png)
+![Initial state of the lattice fitnessses](https://github.com/hildobby/Complex_System/blob/master/src/figures/lattice_itr%3D1.png) ![Age of the nodes on the lattice after 2000 iterations](https://github.com/hildobby/Complex_System/blob/master/src/figures/lattice-age_itr%3D2000.png)
 
 ## Setup required packages
 
