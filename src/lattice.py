@@ -32,6 +32,7 @@ import seaborn as sns
 # Automatically setting the local path to this repo for easy file writing and saving
 dir_path = path.dirname(path.realpath(__file__))
 
+
 class Lattice():
     def __init__(self, size=(10, 10),
                  rand_dist=('uniform',),
@@ -543,7 +544,7 @@ if __name__ == "__main__":
         plt.colorbar(fitness)
         plt.tight_layout()
         plt.savefig(path.join(dir_path, 'figures/lattice_itr=1.png'), dpi=300)
-        
+
         plt.figure()
         plt.title('Age Distribution after {} iterations'.format(iterations))
         age = lattice.plot(label='age')
@@ -551,9 +552,6 @@ if __name__ == "__main__":
         plt.tight_layout()
         plt.savefig(path.join(dir_path, 'figures/lattice-age_itr={}.png'.format(iterations)), dpi=300)
         #
-
-
-
 
         """
         number_of_frames = 2000

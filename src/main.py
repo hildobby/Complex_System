@@ -31,13 +31,13 @@ dir_path = path.dirname(path.realpath(__file__))
 warnings.filterwarnings("ignore")
 
 
-def print_statement(alpha,r,p,name):
+def print_statement(alpha, r, p, name):
 
-    print("The slope of {} disrtibution is {}".format(name, round(alpha,4)))
+    print("The slope of {} disrtibution is {}".format(name, round(alpha, 4)))
     if r < 0:
-        print("{} follows a lognormal distribution with a p = {} ".format(name,round(p,4)))
+        print("{} follows a lognormal distribution with a p = {} ".format(name, round(p, 4)))
     if r > 0:
-        print("{} follows a powerlaw distribution with a p = {} ".format(name, round(p,4)))
+        print("{} follows a powerlaw distribution with a p = {} ".format(name, round(p, 4)))
 
 
 def comp_average_fitness(size=(20, 20), iteration=2000, repetition=10, std=0.3):
@@ -102,7 +102,6 @@ def comp_average_fitness(size=(20, 20), iteration=2000, repetition=10, std=0.3):
     plt.show()
 
 
-
 def comp_avalanche_time(size=(20, 20), iteration=2000, repetition=10, std=0.2):
     """
     Plots the avalanche distribution in a log-log plot
@@ -153,9 +152,8 @@ def comp_avalanche_time(size=(20, 20), iteration=2000, repetition=10, std=0.2):
                 dpi=300)
     plt.show()
 
-    print_statement(result_uniform.power_law.alpha,  R_unifrom,p_uniform, "uniform")
+    print_statement(result_uniform.power_law.alpha, R_unifrom, p_uniform, "uniform")
     print_statement(result_gaussian.power_law.alpha, R_gaussian, p_gaussian, "gaussian")
-
 
 
 def comp_mutation_dist(size=(20, 20), iteration=2000, repetition=10, std=0.2):
@@ -211,9 +209,8 @@ def comp_mutation_dist(size=(20, 20), iteration=2000, repetition=10, std=0.2):
                 dpi=300)
     plt.show()
 
-    print_statement(result_uniform.power_law.alpha,  R_unifrom,p_uniform, "uniform")
+    print_statement(result_uniform.power_law.alpha, R_unifrom, p_uniform, "uniform")
     print_statement(result_gaussian.power_law.alpha, R_gaussian, p_gaussian, "gaussian")
-
 
 
 def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
@@ -253,10 +250,10 @@ def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
             free_percent=0,
             iterations=iterations,
         )
-        moore = Lattice(size=size, torus_mode=True,neighbourhood='Moore', rand_dist=('uniform',), free_percent=0, iterations=iterations,
+        moore = Lattice(size=size, torus_mode=True, neighbourhood='Moore', rand_dist=('uniform',), free_percent=0, iterations=iterations,
                         )
-        vonNeumann = Lattice(size=(50,50), torus_mode=True,neighbourhood='von Neumann', rand_dist=('uniform',), free_percent=0,
-                          iterations=iterations,)
+        vonNeumann = Lattice(size=(50, 50), torus_mode=True, neighbourhood='von Neumann', rand_dist=('uniform',), free_percent=0,
+                             iterations=iterations,)
 
         moore.run(["mutation", "avalanche_time", "get_dist_btw_mutation"])
         vonNeumann.run(["mutation", "avalanche_time", "get_dist_btw_mutation"])
@@ -296,10 +293,8 @@ def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
     R_vonNeumann, p_vonNeumann = result_vonNeumann.distribution_compare(
         'power_law', 'exponential', normalized_ratio=True)
 
-
-    print_statement(result_moore.power_law.alpha,  R_moore,p_moore, "More Neighbour")
-    print_statement(result_vonNeumann.power_law.alpha, R_vonNeumann,p_vonNeumann, "von Neumann Neighbourhood")
-
+    print_statement(result_moore.power_law.alpha, R_moore, p_moore, "More Neighbour")
+    print_statement(result_vonNeumann.power_law.alpha, R_vonNeumann, p_vonNeumann, "von Neumann Neighbourhood")
 
     n_moore, bins_moore = np.histogram(mutation_dist_moore_list, density=True)
     n_vonNeumann, bins_vonNeumann = np.histogram(mutation_dist_vonNeumann_list, density=True)
@@ -320,8 +315,9 @@ def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
     plt.savefig(path.join(dir_path, 'figures/diff_neighbours_s={}_itr={}_rep={}.png'.format(size, iteration, repetition)), dpi=300)
     plt.show()
 
-    print_statement(result_moore.power_law.alpha,  R_moore,p_moore, "More Neighbour")
-    print_statement(result_vonNeumann.power_law.alpha, R_vonNeumann,p_vonNeumann, 'von Neumann')
+    print_statement(result_moore.power_law.alpha, R_moore, p_moore, "More Neighbour")
+    print_statement(result_vonNeumann.power_law.alpha, R_vonNeumann, p_vonNeumann, 'von Neumann')
+
 
 def is_free_variation(i_min=0, i_max=1, i_iter=6, iterations=2000):
     '''
@@ -394,58 +390,52 @@ def is_free_variation(i_min=0, i_max=1, i_iter=6, iterations=2000):
 def comp_cluster_sizes(iterations=2000):
     # Compares the cluster sizes of different sizes of grid
 
+    small = Lattice(size=(20, 20), torus_mode=True, rand_dist=('uniform',), free_percent=0, iterations=iterations,
+                    age_fraction=1 / 10)
+    medium = Lattice(size=(50, 50), torus_mode=True, rand_dist=('uniform',), free_percent=0, iterations=iterations,
+                     age_fraction=1 / 10)
+
+    large = Lattice(size=(70, 70), torus_mode=True, rand_dist=('uniform',), free_percent=0, iterations=iterations,
+                    age_fraction=1 / 10)
+
+    small.run(["mutation", "update_age", "get_cluster"])
+    medium.run(["mutation", "update_age", "get_cluster"])
+    large.run(["mutation", "update_age", "get_cluster"])
+
+    small_hist = np.concatenate([small.cluster_size[x] for x in small.cluster_size])
+    medium_hist = np.concatenate([medium.cluster_size[x] for x in medium.cluster_size])
+    large_hist = np.concatenate([large.cluster_size[x] for x in large.cluster_size])
+
+    # get the power law
+    small_results = powerlaw.Fit(small_hist, discrete=True, verbose=False)
+    medium_results = powerlaw.Fit(medium_hist, dicsrete=True, verbose=False)
+    large_resutls = powerlaw.Fit(large_hist, discrete=True, verbose=False)
+
+    r_small, p_small = small_results.distribution_compare('power_law', 'exponential', normalized_ratio=True)
+    r_medium, p_medium = medium_results.distribution_compare('power_law', 'exponential', normalized_ratio=True)
+    r_large, p_large = large_resutls.distribution_compare('power_law', 'exponential', normalized_ratio=True)
+
+    # plot the power law
+    plt.figure()
+    powerlaw.plot_pdf(small_hist, label='20X20 Grid')
+    powerlaw.plot_pdf(medium_hist, label='50X50 Grid')
+    powerlaw.plot_pdf(large_hist, label='70X70 Grid')
+
+    plt.title("Compare cluster size for different grid sizes")
+    plt.xlabel("Cluster size ")
+    plt.ylabel("Probability")
+    plt.legend()
+    plt.grid()
+    plt.tight_layout()
+    plt.savefig(path.join(dir_path, 'figures/cluster-sizes_rep={}.png'.format(iterations)), dpi=300)
+    plt.show()
+
+    print_statement(small_results.power_law.alpha, r_small, p_small, "the 20X20 grid's")
+    print_statement(medium_results.power_law.alpha, r_medium, p_medium, "the 50X50 grid's")
+    print_statement(large_resutls.power_law.alpha, r_large, p_large, "the 70X70 grid's")
 
 
-
-        small= Lattice(size=(20,20), torus_mode=True, rand_dist=('uniform',), free_percent=0, iterations=iterations,
-                          age_fraction=1 / 10)
-        medium = Lattice(size=(50,50), torus_mode=True, rand_dist=('uniform',), free_percent=0, iterations=iterations,
-                          age_fraction=1 / 10)
-
-        large = Lattice(size=(70,70), torus_mode=True, rand_dist=('uniform',), free_percent=0, iterations=iterations,
-                          age_fraction=1 / 10)
-
-        small.run(["mutation", "update_age","get_cluster"])
-        medium.run(["mutation","update_age","get_cluster"])
-        large.run(["mutation","update_age","get_cluster"])
-
-
-        small_hist = np.concatenate([small.cluster_size[x] for x in small.cluster_size])
-        medium_hist = np.concatenate([medium.cluster_size[x] for x in medium.cluster_size])
-        large_hist = np.concatenate([large.cluster_size[x] for x in large.cluster_size])
-
-
-        #get the power law
-        small_results = powerlaw.Fit(small_hist, discrete = True, verbose=False)
-        medium_results = powerlaw.Fit(medium_hist,dicsrete = True, verbose=False)
-        large_resutls = powerlaw.Fit(large_hist,discrete = True, verbose=False)
-
-        r_small,p_small = small_results.distribution_compare('power_law', 'exponential', normalized_ratio = True)
-        r_medium,p_medium = medium_results.distribution_compare('power_law', 'exponential', normalized_ratio = True)
-        r_large,p_large = large_resutls.distribution_compare('power_law', 'exponential', normalized_ratio = True)
-
-
-
-        #plot the power law
-        plt.figure()
-        powerlaw.plot_pdf(small_hist,label='20X20 Grid')
-        powerlaw.plot_pdf(medium_hist,label = '50X50 Grid')
-        powerlaw.plot_pdf(large_hist,label = '70X70 Grid')
-
-
-        plt.title("Compare cluster size for different grid sizes")
-        plt.xlabel("Cluster size ")
-        plt.ylabel("Probability")
-        plt.legend()
-        plt.show()
-
-
-        print_statement(small_results.power_law.alpha, r_small, p_small, "the 20X20 grid's")
-        print_statement(medium_results.power_law.alpha, r_medium, p_medium, "the 50X50 grid's")
-        print_statement(large_resutls.power_law.alpha, r_large, p_large, "the 70X70 grid's")
-
-
-def comp_moving_vs_stationary(size=(20, 20),iteration = 2000,repetition = 10):
+def comp_moving_vs_stationary(size=(20, 20), iteration=2000, repetition=10):
     """
     Compares the cluster sizes  and avalanche time
 
@@ -458,13 +448,21 @@ def comp_moving_vs_stationary(size=(20, 20),iteration = 2000,repetition = 10):
     avalanche_stationary_list = []
 
     for i in range(repetition):
-        stationary = Lattice(size=size, torus_mode=True,neighbourhood='Moore', rand_dist=('uniform',), free_percent=0, iterations=iterations,
-                        )
-        move = Lattice(size=(50,50), torus_mode=True,neighbourhood='Moore', rand_dist=('uniform',), free_percent=0.3,
-                          iterations=iterations,)
+        stationary = Lattice(
+            size=size,
+            torus_mode=True,
+            neighbourhood='Moore',
+            rand_dist=(
+                'uniform',
+            ),
+            free_percent=0,
+            iterations=iterations,
+        )
+        move = Lattice(size=(50, 50), torus_mode=True, neighbourhood='Moore', rand_dist=('uniform',), free_percent=0.3,
+                       iterations=iterations,)
 
-        stationary.run(["mutation","avalanche_time"])
-        move.run(["moving","avalanche_time"])
+        stationary.run(["mutation", "avalanche_time"])
+        move.run(["moving", "avalanche_time"])
 
         avalanche_move_list = avalanche_move_list + move.avalanche_time_list['avalanche_time']
         avalanche_stationary_list = avalanche_stationary_list + stationary.avalanche_time_list['avalanche_time']
@@ -486,26 +484,23 @@ def comp_moving_vs_stationary(size=(20, 20),iteration = 2000,repetition = 10):
     plt.xlabel("Avalanche sizes ")
     plt.grid()
     plt.tight_layout()
+    plt.savefig(path.join(dir_path, 'figures/moving-vs-stationary_size={}_itr{}_rep={}.png'.format(size, iteration, repetition)), dpi=300)
     plt.show()
-
-
 
     print_statement(result_move.power_law.alpha, R_move, p_move, "migration")
     print_statement(result_stationary.power_law.alpha, R_stationary, p_stationary, "no migration")
 
 
-
-
-def comp_diff_dim(iterations = 2000):
+def comp_diff_dim(iterations=2000):
     """
     Compares
     """
     # Compares the cluster sizes of different sizes of grid
 
     grid = Lattice(size=(20, 20), torus_mode=True, rand_dist=('uniform',), free_percent=0, iterations=iterations,
-                    age_fraction=1 / 10)
+                   age_fraction=1 / 10)
     cube = Lattice(size=(20, 20, 3), torus_mode=True, rand_dist=('uniform',), free_percent=0, iterations=iterations,
-                     age_fraction=1 / 10)
+                   age_fraction=1 / 10)
 
     grid.run(["mutation", "update_age", "get_cluster"])
     cube.run(["mutation", "update_age", "get_cluster"])
@@ -514,28 +509,27 @@ def comp_diff_dim(iterations = 2000):
     cube_hist = np.concatenate([cube.cluster_size[x] for x in cube.cluster_size])
 
     # get the power law
-    grid_results = powerlaw.Fit(grid_hist, discrete=True,verbose=False)
-    cube_results = powerlaw.Fit(grid_hist, dicsrete=True,verbose=False)
+    grid_results = powerlaw.Fit(grid_hist, discrete=True, verbose=False)
+    cube_results = powerlaw.Fit(grid_hist, dicsrete=True, verbose=False)
 
     r_grid, p_grid = grid_results.distribution_compare('power_law', 'exponential', normalized_ratio=True)
     r_cube, p_cube = cube_results.distribution_compare('power_law', 'exponential', normalized_ratio=True)
 
     # plot the power law
     plot_setting()
-    powerlaw.plot_pdf(grid_hist,label='2 Dimensions')
-    powerlaw.plot_pdf(cube_hist,label = '3 Dimensions')
+    powerlaw.plot_pdf(grid_hist, label='2 Dimensions')
+    powerlaw.plot_pdf(cube_hist, label='3 Dimensions')
     plt.title("Cluster Distribution for 2D and 3D")
     plt.xlabel("Cluster size ")
     plt.ylabel("Probability ")
     plt.grid()
     plt.legend()
     plt.tight_layout()
+    plt.savefig(path.join(dir_path, 'figures/different_dimentionsitr{}_.png'.format(iterations)), dpi=300)
     plt.show()
 
     print_statement(grid_results.power_law.alpha, r_grid, p_grid, "2D")
     print_statement(cube_results.power_law.alpha, r_cube, p_cube, "3D")
-
-
 
 
 def get_fitness_dist(iterations=20000):
@@ -549,16 +543,12 @@ def get_fitness_dist(iterations=20000):
 
     plot_setting()
     plt.figure()
-    plt.hist(list(lattice.fitness_dict.values()),label='Fitness Distribution')
-    plt.axvline(x=max(lattice.threshold_list['threshold']), color='red',label='Threshold')
+    plt.hist(list(lattice.fitness_dict.values()), label='Fitness Distribution')
+    plt.axvline(x=max(lattice.threshold_list['threshold']), color='red', label='Threshold')
     plt.xlim((0, 1))
     plt.xlabel('Fitness')
     plt.ylabel('Probability')
     plt.tight_layout()
     plt.legend()
-
+    plt.savefig(path.join(dir_path, 'figures/fitness_distance_itr{}_.png'.format(iterations)), dpi=300)
     plt.show()
-
-
-
-

@@ -9,3 +9,4 @@ importlib
 powerlaw
 mpl_toolkits
 pickle
+seaborn
