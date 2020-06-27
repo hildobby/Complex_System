@@ -26,7 +26,8 @@ By: [Hildebert Moulié](https://github.com/hildobby), [Philippe Nicolau](https:/
 ![Fitness over time](https://github.com/hildobby/Complex_System/blob/master/src/figures/average_fitness_s%3D(20%2C%2020)_itr%3D2000_rep%3D10_std%3D0.3.png)
 
 ### Impact of percentage of empty node
-![Impact of percentage of empty node](https://github.com/hildobby/Complex_System/blob/master/presentation_content/images/emptynode1.jpeg)
+![Avalanche for different percentages of empty node](https://github.com/hildobby/Complex_System/blob/master/src/figures/avalanche_empy_space_percentage_comparison.png)
+![Threshold for different percentages of empty node](https://github.com/hildobby/Complex_System/blob/master/src/figures/threshold_empy_space_percentage_comparison.png)
 
 
 ### Cluster size distribution for different grid sizes

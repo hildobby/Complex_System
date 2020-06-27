@@ -525,7 +525,7 @@ def comp_diff_dim(iterations=2000):
     plt.grid()
     plt.legend()
     plt.tight_layout()
-    plt.savefig(path.join(dir_path, 'figures/different_dimentionsitr{}_.png'.format(iterations)), dpi=300)
+    plt.savefig(path.join(dir_path, 'figures/different_dimentions_itr={}.png'.format(iterations)), dpi=300)
     plt.show()
 
     print_statement(grid_results.power_law.alpha, r_grid, p_grid, "2D")
@@ -550,5 +550,5 @@ def get_fitness_dist(iterations=20000):
     plt.ylabel('Probability')
     plt.tight_layout()
     plt.legend()
-    plt.savefig(path.join(dir_path, 'figures/fitness_distance_itr{}_.png'.format(iterations)), dpi=300)
+    plt.savefig(path.join(dir_path, 'figures/fitness_distance_itr={}.png'.format(iterations)), dpi=300)
     plt.show()

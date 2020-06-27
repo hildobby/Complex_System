@@ -552,4 +552,3 @@ if __name__ == "__main__":
         plt.tight_layout()
         plt.savefig(path.join(dir_path, 'figures/lattice-age_itr={}.png'.format(iterations)), dpi=300)
         #
-
