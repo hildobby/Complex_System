@@ -40,7 +40,6 @@ Call functions by their name!\n\
 func \'comp_average_fitness\' runs the model and plots the evolution of average fitness and the threshold at the end\n\
 func \'comp_avalanche_time\'  compares the avalanche time between fintess generated unifromly or by the gaussin random generator\n\
 func \'comp_mutation_dist\'  compares the distribution of the distance between mutations for models using gaussin/uniform random generator\n\
-func \'is_free_variation\' compares the impact of the density on the avalanche time   \n\
 func \'comp_cluster_sizes\' compares the cluster size distribution for different grid sizes \n\
 func \'comp_moving_vs_stationary\' compares the cluster sizes  and avalanche time between a \n\
 func \'comp_diff_dim\' the cluster size for 2D/3D model \n\
@@ -602,8 +601,6 @@ if len(sys.argv) >= 1:
 
     elif parser.func == 'comp_mutation_dist' :
         comp_mutation_dist(iteration = parser.itr,repetition =parser.rep,std= parser.std)
-    elif parser.func == 'is_free_variation' :
-        is_free_variation(iterations = parser.itr)
 
     elif parser.func == 'comp_cluster_sizes':
         comp_cluster_sizes(iterations = parser.itr)
