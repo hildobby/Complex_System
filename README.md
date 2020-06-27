@@ -41,7 +41,7 @@ By: [Hildebert Moulié](https://github.com/hildobby), [Philippe Nicolau](https:/
 
 ## Working with the repository
 
-Gathering the required packages
+In order to locally gather the required packages, the following command can be called:
 ```
 pip3 install -r requirements.txt
 ```
