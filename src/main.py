@@ -23,12 +23,37 @@ import numpy as np
 import powerlaw
 import warnings
 import matplotlib.patches as mpatches
-import seaborn as sns
+import argparse
+from termcolor import colored
 
 # Automatically setting the local path to this repo for easy file writing and saving
 dir_path = path.dirname(path.realpath(__file__))
 # Only keep the warnings printed in the output
 warnings.filterwarnings("ignore")
+
+
+
+
+parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
+description='Uses the lattice object from lattice.py to perform different experiments.\n\
+Call functions by their name!\n\
+func \'comp_average_fitness\' runs the model and plots the evolution of average fitness and the threshold at the end\n\
+func \'comp_avalanche_time\'  compares the avalanche time between fintess generated unifromly or by the gaussin random generator\n\
+func \'comp_mutation_dist\'  compares the distribution of the distance between mutations for models using gaussin/uniform random generator\n\
+func \'is_free_variation\' compares the impact of the density on the avalanche time   \n\
+func \'comp_cluster_sizes\' compares the cluster size distribution for different grid sizes \n\
+func \'comp_moving_vs_stationary\' compares the cluster sizes  and avalanche time between a \n\
+func \'comp_diff_dim\' the cluster size for 2D/3D model \n\
+func \'get_fitness_dist\' the fitness distribution after n iterations ')
+
+
+
+parser.add_argument("-func",type = str, help='Defines which function to execute')
+parser.add_argument('-itr', type=int,default=200, help='Number of iteration for the model (default : 50)')
+parser.add_argument('-rep', type=int,default=10, help='Number of repetition (default : 10)')
+parser.add_argument('-std', type=float,default=0.3, help='Standard deviation for gaussian random generator (default : 0.3)')
+parser=parser.parse_args()
+
 
 
 def print_statement(alpha, r, p, name):
@@ -42,7 +67,8 @@ def print_statement(alpha, r, p, name):
 
 def comp_average_fitness(size=(20, 20), iteration=2000, repetition=10, std=0.3):
     """
-    Plots the average fitness for different distribution and the threshold
+    Plots the average fitness for different distribution and the threshold for a model
+    using uniform/gaussian random generator
     :param : number of iterations, number of repetition and standard deviation for gaussian distribution
     """
 
@@ -104,7 +130,7 @@ def comp_average_fitness(size=(20, 20), iteration=2000, repetition=10, std=0.3):
 
 def comp_avalanche_time(size=(20, 20), iteration=2000, repetition=10, std=0.2):
     """
-    Plots the avalanche distribution in a log-log plot
+    Plots the avalanche distribution in a log-log plot for a model using uniform/gaussian random generator
     :param : number of iterations, number of repetition and standard deviation for gaussian distribution
 
     """
@@ -158,7 +184,7 @@ def comp_avalanche_time(size=(20, 20), iteration=2000, repetition=10, std=0.2):
 
 def comp_mutation_dist(size=(20, 20), iteration=2000, repetition=10, std=0.2):
     """
-    Plots the distribution between distances between mutations
+    Plots the distribution between distances between mutations for a model using uniform/gaussian random generator
     :param : size of the grid,number of iterations, number of repetition and standard deviation for gaussian distribution
     """
 
@@ -215,7 +241,7 @@ def comp_mutation_dist(size=(20, 20), iteration=2000, repetition=10, std=0.2):
 
 def comp_diff_neighbours(size=(20, 20), iteration=2000, repetition=10):
     """
-    Plots the avalanche distribution in a log-log plot
+    Plots the avalanche distribution in a log-log plot  for a model using Moore/van Neumann Neighbourhood
     :param : number of iterations, number of repetition and standard deviation for gaussian distribution
 
     """
@@ -388,7 +414,13 @@ def is_free_variation(i_min=0, i_max=1, i_iter=6, iterations=2000):
 
 
 def comp_cluster_sizes(iterations=2000):
-    # Compares the cluster sizes of different sizes of grid
+    """
+     Compares the cluster sizes of different sizes of grid  using uniform random generator for the fitness
+    :param iterations: number of steps to run for the Bak-Sneppen model
+    """
+
+
+    print(colored("Warning this function might take long (2000 itr ~ 40 min)",'red'))
 
     small = Lattice(size=(20, 20), torus_mode=True, rand_dist=('uniform',), free_percent=0, iterations=iterations,
                     age_fraction=1 / 10)
@@ -437,8 +469,9 @@ def comp_cluster_sizes(iterations=2000):
 
 def comp_moving_vs_stationary(size=(20, 20), iteration=2000, repetition=10):
     """
-    Compares the cluster sizes  and avalanche time
-
+    Compares the cluster sizes  and avalanche time between a stationary model and a model where the nodes
+    can move to free space
+    :param : number of iterations, number of repetition and standard deviation for gaussian distribution
     """
     # Get a comparison between the different random distribution
     iterations = iteration
@@ -493,7 +526,7 @@ def comp_moving_vs_stationary(size=(20, 20), iteration=2000, repetition=10):
 
 def comp_diff_dim(iterations=2000):
     """
-    Compares
+    Compares the cluster size distribution for 2 Dimensions and 3 Dimensions
     """
     # Compares the cluster sizes of different sizes of grid
 
@@ -552,3 +585,34 @@ def get_fitness_dist(iterations=20000):
     plt.legend()
     plt.savefig(path.join(dir_path, 'figures/fitness_distance_itr={}.png'.format(iterations)), dpi=300)
     plt.show()
+
+
+
+
+if len(sys.argv) >= 1:
+
+    if parser.func == 'comp_average_fitness':
+        comp_average_fitness(iteration = parser.itr,repetition =parser.rep,std= parser.std)
+
+    elif parser.func ==  'comp_average_fitness':
+        comp_average_fitness(iteration = parser.itr,repetition =parser.rep,std= parser.std)
+
+    elif parser.func == 'comp_avalanche_time':
+        comp_avalanche_time(iteration = parser.itr,repetition =parser.rep,std= parser.std)
+
+    elif parser.func == 'comp_mutation_dist' :
+        comp_mutation_dist(iteration = parser.itr,repetition =parser.rep,std= parser.std)
+    elif parser.func == 'is_free_variation' :
+        is_free_variation(iterations = parser.itr)
+
+    elif parser.func == 'comp_cluster_sizes':
+        comp_cluster_sizes(iterations = parser.itr)
+
+    elif parser.func == 'comp_moving_vs_stationary':
+        comp_moving_vs_stationary(iteration = parser.itr,repetition =parser.rep)
+
+    elif parser.func == 'comp_diff_dim':
+        comp_diff_dim(iterations = parser.itr)
+
+    elif parser.func == 'get_fitness_dist':
+        get_fitness_dist(iterations = parser.itr)

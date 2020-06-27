@@ -5,6 +5,7 @@
 Created on Tuesday June 16 2020
 This code was implemented by
 Louis Weyland, Hildebert Mouilé, Philippe Nicolau & Binjie Zhou.
+This code creates a Networkx object incorporating the Bak-Sneppen model
 """
 
 from os import path
@@ -27,7 +28,6 @@ import numpy as np
 from pylab import arange
 from scipy.ndimage import measurements
 import matplotlib.animation as animation
-import seaborn as sns
 
 # Automatically setting the local path to this repo for easy file writing and saving
 dir_path = path.dirname(path.realpath(__file__))
@@ -252,7 +252,8 @@ class Lattice():
 
     def move(self):
         """
-        The node with lowest fitness get moved to free place when the mean fitness of its neighbors is above the total average while lower than new neighbors
+        The node with lowest fitness get moved to free place when the mean fitness
+        of its neighbors is above the total average while lower than new neighbors
         """
         free_nodes = list(dict(filter(lambda elem: elem[1], self.free_dict.items())).keys())
         shuffle(free_nodes)
@@ -391,7 +392,7 @@ class Lattice():
 
     def plot(self, label='fitness'):
         """
-        Visualise the graph and plot labels it labels = True
+        Visualise the graph with the respective attribute fitness or age
         """
         if label == 'fitness':
             values = set(self.fitness_dict.values())
